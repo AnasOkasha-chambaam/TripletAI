@@ -7,6 +7,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Header } from "@/components/shared/Header";
 import { Footer } from "@/components/shared/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,11 +82,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </div>
+            <>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </div>
+              <Toaster position="top-center" richColors closeButton />
+            </>
           </ThemeProvider>
         </body>
       </html>

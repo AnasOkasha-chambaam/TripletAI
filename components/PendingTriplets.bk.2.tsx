@@ -18,27 +18,14 @@ import {
   updateTripletStatus,
   editTriplet,
 } from "@/lib/actions/triplet.actions";
-import { toast } from "sonner";
 import { CheckCircle, XCircle, Edit, ArrowDown } from "lucide-react";
-
-interface Triplet {
-  _id: string;
-  instruction: string;
-  input: string;
-  output: string;
-}
+import { toast } from "sonner";
 
 export default function PendingTriplets() {
-  const [triplets, setTriplets] = useState<Triplet[]>([]);
-  const [currentTriplet, setCurrentTriplet] = useState<Triplet | null>(null);
+  const [triplets, setTriplets] = useState<TTriplet[]>([]);
+  const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const controls = useAnimation();
-  const iconControls = {
-    right: useAnimation(),
-    left: useAnimation(),
-    up: useAnimation(),
-    down: useAnimation(),
-  };
 
   const [updateState, updateAction] = useActionState(updateTripletStatus, null);
 
@@ -95,45 +82,14 @@ export default function PendingTriplets() {
     }
 
     if (newStatus) {
-      const formData = new FormData();
-      formData.append("id", currentTriplet._id);
-      formData.append("status", newStatus);
-
-      startTransition(() => updateAction(formData));
+      startTransition(() =>
+        updateAction({ tripletId: currentTriplet._id, newStatus })
+      );
     }
   };
 
   const handlers = useSwipeable({
-    onSwiping: (eventData) => {
-      const { dir, deltaX, deltaY } = eventData;
-      controls.start({ x: deltaX, y: deltaY });
-
-      // Animate icons based on swipe direction
-      const threshold = 50;
-      iconControls.right.start({
-        scale: deltaX > threshold ? 1.5 : 1,
-        opacity: 1,
-      });
-      iconControls.left.start({
-        scale: deltaX < -threshold ? 1.5 : 1,
-        opacity: 1,
-      });
-      iconControls.up.start({
-        scale: deltaY < -threshold ? 1.5 : 1,
-        opacity: 1,
-      });
-      iconControls.down.start({
-        scale: deltaY > threshold ? 1.5 : 1,
-        opacity: 1,
-      });
-    },
-    onSwiped: (eventData) => {
-      // handleSwipe(eventData.dir.toLowerCase());
-      controls.start({ x: 0, y: 0 });
-      Object.values(iconControls).forEach((control) =>
-        control.start({ scale: 1, opacity: 0 })
-      );
-    },
+    onSwiped: (eventData) => handleSwipe(eventData.dir.toLowerCase()),
     // preventDefaultTouchmoveEvent: true,
     trackMouse: true,
   });
@@ -142,7 +98,7 @@ export default function PendingTriplets() {
     event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
-    const threshold = 50; // minimum distance required to trigger a swipe
+    const threshold = 100; // minimum distance required to trigger a swipe
     if (Math.abs(info.offset.x) > threshold) {
       handleSwipe(info.offset.x > 0 ? "right" : "left");
     } else if (Math.abs(info.offset.y) > threshold) {
@@ -150,9 +106,6 @@ export default function PendingTriplets() {
     } else {
       controls.start({ x: 0, y: 0 });
     }
-    Object.values(iconControls).forEach((control) =>
-      control.start({ scale: 1, opacity: 0 })
-    );
   };
 
   const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -160,7 +113,6 @@ export default function PendingTriplets() {
     if (!currentTriplet) return;
 
     const formData = new FormData(event.currentTarget);
-    formData.append("id", currentTriplet._id);
 
     startTransition(() => editAction(formData));
   };
@@ -171,56 +123,23 @@ export default function PendingTriplets() {
 
   return (
     <div {...handlers}>
-      <div className="relative md:p-20 w-fit mx-auto">
-        <motion.div
-          drag
-          dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-          onDragEnd={handleDragEnd}
-          animate={controls}
-          className="relative z-10"
-        >
-          <Card className="w-full max-w-md mx-auto">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-2">Instruction:</h3>
-              <p className="mb-4">{currentTriplet.instruction}</p>
-              <h3 className="font-bold mb-2">Input:</h3>
-              <p className="mb-4">{currentTriplet.input}</p>
-              <h3 className="font-bold mb-2">Output:</h3>
-              <p>{currentTriplet.output}</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Swipe direction icons */}
-        <motion.div
-          className="absolute top-1/2 right-0 transform translate-x-full -translate-y-1/2 z-10"
-          animate={iconControls.right}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <CheckCircle className="w-12 h-12 text-green-500" />
-        </motion.div>
-        <motion.div
-          className="absolute top-1/2 left-0 transform -translate-x-full -translate-y-1/2 z-10"
-          animate={iconControls.left}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <XCircle className="w-12 h-12 text-red-500" />
-        </motion.div>
-        <motion.div
-          className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full z-10"
-          animate={iconControls.up}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <Edit className="w-12 h-12 text-blue-500" />
-        </motion.div>
-        <motion.div
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full z-10"
-          animate={iconControls.down}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <ArrowDown className="w-12 h-12 text-yellow-500" />
-        </motion.div>
-      </div>
+      <motion.div
+        drag
+        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        onDragEnd={handleDragEnd}
+        animate={controls}
+      >
+        <Card className="w-full max-w-md mx-auto">
+          <CardContent className="p-6">
+            <h3 className="font-bold mb-2">Instruction:</h3>
+            <p className="mb-4">{currentTriplet.instruction}</p>
+            <h3 className="font-bold mb-2">Input:</h3>
+            <p className="mb-4">{currentTriplet.input}</p>
+            <h3 className="font-bold mb-2">Output:</h3>
+            <p>{currentTriplet.output}</p>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent>

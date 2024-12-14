@@ -1,4 +1,6 @@
 import AcceptedTriplets from "@/components/AcceptedTriplets";
+import { AddTripletDialog } from "@/components/AddTripletDialog";
+import { ImportTripletsDialog } from "@/components/ImportTripletsDialog";
 import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,10 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Dashboard() {
   return (
     <div className="min-h-screen">
-      <main className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-8">
-          Supervised Learning Triplets Dashboard
-        </h1>
+      <section className="container mx-auto p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-foreground/80">
+            Triplets
+          </h2>
+          <div className="space-x-4">
+            <ImportTripletsDialog />
+            <AddTripletDialog />
+          </div>
+        </div>
         <Tabs defaultValue="pending">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -26,7 +34,7 @@ export default function Dashboard() {
             <RejectedTriplets />
           </TabsContent>
         </Tabs>
-      </main>
+      </section>
     </div>
   );
 }

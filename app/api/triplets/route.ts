@@ -8,7 +8,9 @@ export async function GET(request: Request) {
 
   await dbConnect();
 
-  const triplets = await Triplet.find(status ? { status } : {});
+  const triplets = await Triplet.find(status ? { status } : {}).sort(
+    "-createdAt"
+  );
   return NextResponse.json(triplets);
 }
 

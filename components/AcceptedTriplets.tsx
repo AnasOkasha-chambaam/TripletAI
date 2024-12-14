@@ -5,15 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
-interface Triplet {
-  _id: string;
-  input: string;
-  output: string;
-  explanation: string;
-}
-
 export default function AcceptedTriplets() {
-  const [triplets, setTriplets] = useState<Triplet[]>([]);
+  const [triplets, setTriplets] = useState<TTriplet[]>([]);
   const [selectedTriplets, setSelectedTriplets] = useState<string[]>([]);
 
   useEffect(() => {
@@ -51,11 +44,11 @@ export default function AcceptedTriplets() {
       content = JSON.stringify(selectedData, null, 2);
       filename = "accepted_triplets.json";
     } else {
-      const headers = ["input", "output", "explanation"];
+      const headers = ["input", "output", "instruction"];
       const csvContent = [
         headers.join(","),
         ...selectedData.map((t) =>
-          headers.map((h) => t[h as keyof Triplet]).join(",")
+          headers.map((h) => t[h as keyof TTriplet]).join(",")
         ),
       ].join("\n");
       content = csvContent;
@@ -79,10 +72,19 @@ export default function AcceptedTriplets() {
             : "Select All"}
         </Button>
         <div>
-          <Button onClick={() => handleExport("json")} className="mr-2">
+          <Button
+            onClick={() => handleExport("json")}
+            className="mr-2"
+            disabled={!selectedTriplets.length}
+          >
             Export JSON
           </Button>
-          <Button onClick={() => handleExport("csv")}>Export CSV</Button>
+          <Button
+            onClick={() => handleExport("csv")}
+            disabled={!selectedTriplets.length}
+          >
+            Export CSV
+          </Button>
         </div>
       </div>
       {triplets.map((triplet) => (
@@ -95,9 +97,9 @@ export default function AcceptedTriplets() {
               className="mr-4"
             />
             <div>
+              <p>Instruction: {triplet.instruction}</p>
               <h3 className="font-bold">Input: {triplet.input}</h3>
               <p>Output: {triplet.output}</p>
-              <p>Explanation: {triplet.explanation}</p>
             </div>
           </CardContent>
         </Card>

@@ -1,0 +1,22 @@
+[
+  {
+    "input": "rose, jasmine, cedarwood",
+    "instruction": "Describe the scent profile of this fragrance",
+    "output": "A romantic and elegant fragrance with floral top notes of rose and jasmine, grounded by warm and woody cedarwood base notes."
+  },
+  {
+    "input": "bergamot, lavender, vetiver",
+    "instruction": "Suggest a fragrance name for this scent profile",
+    "output": "Azure Serenity"
+  },
+  {
+    "input": "citrus, mint, ginger",
+    "instruction": "Recommend a fragrance occasion for this scent profile",
+    "output": "Ideal for a summer day or a refreshing pick-me-up."
+  },
+  {
+    "input": "chocolate, vanilla, caramel",
+    "instruction": "Create a marketing slogan for this fragrance",
+    "output": "Indulge your senses with a decadent dessert-inspired fragrance."
+  }
+]

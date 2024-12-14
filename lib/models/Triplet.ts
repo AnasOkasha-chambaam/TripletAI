@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const TripletSchema = new mongoose.Schema(
   {
+    instruction: { type: String, required: true },
     input: String,
-    output: String,
-    explanation: String,
+    output: { type: String, required: true },
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],

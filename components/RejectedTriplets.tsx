@@ -13,16 +13,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface Triplet {
-  _id: string;
-  input: string;
-  output: string;
-  explanation: string;
-}
-
 export default function RejectedTriplets() {
-  const [triplets, setTriplets] = useState<Triplet[]>([]);
-  const [editingTriplet, setEditingTriplet] = useState<Triplet | null>(null);
+  const [triplets, setTriplets] = useState<TTriplet[]>([]);
+  const [editingTriplet, setEditingTriplet] = useState<TTriplet | null>(null);
 
   useEffect(() => {
     fetchRejectedTriplets();
@@ -34,7 +27,7 @@ export default function RejectedTriplets() {
     setTriplets(data);
   };
 
-  const handleEditAndAccept = (triplet: Triplet) => {
+  const handleEditAndAccept = (triplet: TTriplet) => {
     setEditingTriplet(triplet);
   };
 
@@ -44,7 +37,7 @@ export default function RejectedTriplets() {
     const updatedTriplet = {
       input: formData.get("input") as string,
       output: formData.get("output") as string,
-      explanation: formData.get("explanation") as string,
+      instruction: formData.get("instruction") as string,
       status: "accepted",
     };
     await fetch(`/api/triplets/${editingTriplet?._id}`, {
@@ -63,7 +56,7 @@ export default function RejectedTriplets() {
           <CardContent className="p-4">
             <h3 className="font-bold">Input: {triplet.input}</h3>
             <p>Output: {triplet.output}</p>
-            <p>Explanation: {triplet.explanation}</p>
+            <p>Instruction: {triplet.instruction}</p>
             <Button
               onClick={() => handleEditAndAccept(triplet)}
               className="mt-2"
@@ -107,13 +100,13 @@ export default function RejectedTriplets() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="explanation" className="text-right">
-                  Explanation
+                <Label htmlFor="instruction" className="text-right">
+                  Instruction
                 </Label>
                 <Input
-                  id="explanation"
-                  name="explanation"
-                  defaultValue={editingTriplet?.explanation}
+                  id="instruction"
+                  name="instruction"
+                  defaultValue={editingTriplet?.instruction}
                   className="col-span-3"
                 />
               </div>
