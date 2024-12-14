@@ -55,7 +55,7 @@ export default function PendingTriplets() {
       fetchPendingTriplets();
       toast.success("Triplet edited successfully");
     }
-  }, [updateState, editState, triplets]);
+  }, [updateState, editState]);
 
   const fetchPendingTriplets = async () => {
     const response = await fetch("/api/triplets?status=pending");
