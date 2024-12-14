@@ -55,7 +55,7 @@ export function ImportTripletsDialog({
         });
       }
     }
-  }, [state]);
+  }, [state, successCallback]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

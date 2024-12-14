@@ -55,7 +55,7 @@ export default function PendingTriplets() {
       fetchPendingTriplets();
       toast.success("Triplet edited successfully");
     }
-  }, [updateState, editState]);
+  }, [updateState, editState, triplets]);
 
   const fetchPendingTriplets = async () => {
     const response = await fetch("/api/triplets?status=pending");
@@ -99,7 +99,7 @@ export default function PendingTriplets() {
 
   const handlers = useSwipeable({
     onSwiping: (eventData) => {
-      const { dir, deltaX, deltaY } = eventData;
+      const { deltaX, deltaY } = eventData;
       controls.start({ x: deltaX, y: deltaY });
 
       // Animate icons based on swipe direction
@@ -121,13 +121,15 @@ export default function PendingTriplets() {
         opacity: 1,
       });
     },
-    onSwiped: (eventData) => {
-      // handleSwipe(eventData.dir.toLowerCase());
-      controls.start({ x: 0, y: 0 });
-      Object.values(iconControls).forEach((control) =>
-        control.start({ scale: 1, opacity: 0 })
-      );
-    },
+    onSwiped: () =>
+      // eventData
+      {
+        // handleSwipe(eventData.dir.toLowerCase());
+        controls.start({ x: 0, y: 0 });
+        Object.values(iconControls).forEach((control) =>
+          control.start({ scale: 1, opacity: 0 })
+        );
+      },
     // preventDefaultTouchmoveEvent: true,
     trackMouse: true,
   });

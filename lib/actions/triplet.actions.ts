@@ -53,7 +53,7 @@ export async function importTriplets(
         columns: true,
         skip_empty_lines: true,
       });
-      tripletsData = records.map((record: any) => ({
+      tripletsData = records.map((record: TTripletFields) => ({
         instruction: record.instruction,
         input: record.input,
         output: record.output,
