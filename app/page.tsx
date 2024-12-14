@@ -1,16 +1,13 @@
-import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChevronRight, BarChart, Layers, Zap } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { BarChart, ChevronRight, Layers, Zap } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
