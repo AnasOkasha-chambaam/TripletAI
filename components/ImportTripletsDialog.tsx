@@ -17,7 +17,11 @@ import { importTriplets } from "@/lib/actions/triplet.actions";
 import { toast } from "sonner";
 import { UploadIcon } from "lucide-react";
 
-export function ImportTripletsDialog() {
+export function ImportTripletsDialog({
+  successCallback,
+}: {
+  successCallback?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [state, formAction, isPending] = useActionState(importTriplets, null);
@@ -42,6 +46,7 @@ export function ImportTripletsDialog() {
         toast.success("Triplets imported successfully", {
           description: `${state.count} triplets have been imported as pending.`,
         });
+        successCallback?.();
       } else {
         toast.error("Error importing triplets", {
           description:

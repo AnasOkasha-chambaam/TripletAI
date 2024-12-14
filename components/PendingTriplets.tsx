@@ -1,36 +1,30 @@
 "use client";
 
-import { useState, useEffect, useActionState, startTransition } from "react";
-import { useSwipeable } from "react-swipeable";
-import { motion, useAnimation, PanInfo } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  updateTripletStatus,
   editTriplet,
+  updateTripletStatus,
 } from "@/lib/actions/triplet.actions";
+import { motion, PanInfo, useAnimation } from "framer-motion";
+import { ArrowDown, CheckCircle, Edit, XCircle } from "lucide-react";
+import { startTransition, useActionState, useEffect, useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Edit, ArrowDown } from "lucide-react";
-
-interface Triplet {
-  _id: string;
-  instruction: string;
-  input: string;
-  output: string;
-}
+import SingleTripletCard from "./shared/SingleTripletCard";
+import EmptyStateCard from "./EmptyStateCard";
 
 export default function PendingTriplets() {
-  const [triplets, setTriplets] = useState<Triplet[]>([]);
-  const [currentTriplet, setCurrentTriplet] = useState<Triplet | null>(null);
+  const [triplets, setTriplets] = useState<TTriplet[]>([]);
+  const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const controls = useAnimation();
   const iconControls = {
@@ -165,8 +159,12 @@ export default function PendingTriplets() {
     startTransition(() => editAction(formData));
   };
 
-  if (!currentTriplet) {
-    return <div>No pending triplets</div>;
+  if (!currentTriplet || triplets.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <EmptyStateCard importSuccessCallback={fetchPendingTriplets} />
+      </div>
+    );
   }
 
   return (
@@ -179,16 +177,7 @@ export default function PendingTriplets() {
           animate={controls}
           className="relative z-10"
         >
-          <Card className="w-full max-w-md mx-auto">
-            <CardContent className="p-6">
-              <h3 className="font-bold mb-2">Instruction:</h3>
-              <p className="mb-4">{currentTriplet.instruction}</p>
-              <h3 className="font-bold mb-2">Input:</h3>
-              <p className="mb-4">{currentTriplet.input}</p>
-              <h3 className="font-bold mb-2">Output:</h3>
-              <p>{currentTriplet.output}</p>
-            </CardContent>
-          </Card>
+          <SingleTripletCard triplet={currentTriplet} />
         </motion.div>
 
         {/* Swipe direction icons */}

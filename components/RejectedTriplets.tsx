@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import SingleTripletCard from "@/components/shared/SingleTripletCard";
+import { Textarea } from "./ui/textarea";
 
 export default function RejectedTriplets() {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
@@ -52,19 +53,11 @@ export default function RejectedTriplets() {
   return (
     <div>
       {triplets.map((triplet) => (
-        <Card key={triplet._id} className="mb-4">
-          <CardContent className="p-4">
-            <h3 className="font-bold">Input: {triplet.input}</h3>
-            <p>Output: {triplet.output}</p>
-            <p>Instruction: {triplet.instruction}</p>
-            <Button
-              onClick={() => handleEditAndAccept(triplet)}
-              className="mt-2"
-            >
-              Edit and Accept
-            </Button>
-          </CardContent>
-        </Card>
+        <SingleTripletCard
+          key={triplet._id}
+          triplet={triplet}
+          onEdit={() => handleEditAndAccept(triplet)}
+        />
       ))}
 
       <Dialog
@@ -77,10 +70,17 @@ export default function RejectedTriplets() {
           </DialogHeader>
           <form onSubmit={handleEditSubmit}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="input" className="text-right">
-                  Input
-                </Label>
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="instruction">Instruction</Label>
+                <Input
+                  id="instruction"
+                  name="instruction"
+                  defaultValue={editingTriplet?.instruction}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="input">Input</Label>
                 <Input
                   id="input"
                   name="input"
@@ -88,25 +88,12 @@ export default function RejectedTriplets() {
                   className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="output" className="text-right">
-                  Output
-                </Label>
-                <Input
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="output">Output</Label>
+                <Textarea
                   id="output"
                   name="output"
                   defaultValue={editingTriplet?.output}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="instruction" className="text-right">
-                  Instruction
-                </Label>
-                <Input
-                  id="instruction"
-                  name="instruction"
-                  defaultValue={editingTriplet?.instruction}
                   className="col-span-3"
                 />
               </div>

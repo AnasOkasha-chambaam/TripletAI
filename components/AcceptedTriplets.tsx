@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import SingleTripletCard from "@/components/shared/SingleTripletCard";
 
 export default function AcceptedTriplets() {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
@@ -88,21 +87,12 @@ export default function AcceptedTriplets() {
         </div>
       </div>
       {triplets.map((triplet) => (
-        <Card key={triplet._id} className="mb-4">
-          <CardContent className="p-4 flex items-center">
-            <Checkbox
-              id={triplet._id}
-              checked={selectedTriplets.includes(triplet._id)}
-              onCheckedChange={() => handleSelect(triplet._id)}
-              className="mr-4"
-            />
-            <div>
-              <p>Instruction: {triplet.instruction}</p>
-              <h3 className="font-bold">Input: {triplet.input}</h3>
-              <p>Output: {triplet.output}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <SingleTripletCard
+          key={triplet._id}
+          triplet={triplet}
+          isSelected={selectedTriplets.includes(triplet._id)}
+          onSelect={() => handleSelect(triplet._id)}
+        />
       ))}
     </div>
   );
