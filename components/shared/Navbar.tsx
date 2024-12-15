@@ -45,17 +45,17 @@ export function Navbar() {
                     {item.label}
                   </Link>
                 ))}
-                <Separator
-                  orientation="vertical"
-                  color="red"
-                  className="h-9 max-h-full"
-                />
+                <Separator orientation="vertical" className="h-9 max-h-full" />
                 <ThemeToggle />
                 <UserButton />
               </div>
             </SignedIn>
             <SignedOut>
-              <SignInButton />
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <SignInButton />
+                <Separator orientation="vertical" className="h-9 max-h-full" />
+                <ThemeToggle />
+              </div>
             </SignedOut>
           </div>
           <div className="flex items-center sm:hidden">

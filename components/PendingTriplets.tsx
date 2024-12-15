@@ -21,6 +21,7 @@ import { useSwipeable } from "react-swipeable";
 import { toast } from "sonner";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import EmptyStateCard from "./EmptyStateCard";
+import { Badge } from "./ui/badge";
 
 export default function PendingTriplets() {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
@@ -171,6 +172,11 @@ export default function PendingTriplets() {
 
   return (
     <div {...handlers}>
+      <div className="w-full flex justify-center items-center">
+        <Badge className="mx-auto">
+          {triplets.length} pending triplet{triplets.length > 1 ? "s" : ""}
+        </Badge>
+      </div>
       <div className="relative md:p-20 w-fit mx-auto">
         <motion.div
           drag
