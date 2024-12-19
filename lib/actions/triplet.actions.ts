@@ -4,9 +4,14 @@ import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
 import { JSONify } from "../utils";
 import { parse } from "csv-parse/sync";
+import { createClient, LiveList } from "@liveblocks/client";
+
+const client = createClient({
+  publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
+});
 
 export async function addTriplet(
-  prevState: TAddTripletState,
+  prevState: TAddTripletState | null,
   formData: FormData
 ) {
   await dbConnect();
@@ -26,6 +31,18 @@ export async function addTriplet(
 
   await newTriplet.save();
 
+  // Update Liveblocks
+  let room = client.getRoom("triplets-room");
+  if (!room) {
+    return { success: false, error: "Room not found" };
+  }
+  const storage = await room.getStorage();
+  const triplets = storage.root.get("triplets") || [];
+
+  triplets.push(JSONify<TTriplet>(newTriplet));
+
+  storage.root.set("triplets", triplets);
+
   return { success: true, triplet: JSONify<TTriplet>(newTriplet) };
 }
 
@@ -40,8 +57,6 @@ export async function importTriplets(
     return { success: false, error: "No file provided" };
   }
 
-  console.log("importing triplets from file: ", file.name, file);
-
   const fileContent = await file.text();
   let tripletsData: TTriplet[];
 
@@ -53,7 +68,7 @@ export async function importTriplets(
         columns: true,
         skip_empty_lines: true,
       });
-      tripletsData = records.map((record: TTripletFields) => ({
+      tripletsData = records.map((record: any) => ({
         instruction: record.instruction,
         input: record.input,
         output: record.output,
@@ -63,9 +78,11 @@ export async function importTriplets(
       return { success: false, error: "Unsupported file format" };
     }
 
-    console.log("imported triplets: ", tripletsData);
-
     const importedTriplets = await Triplet.insertMany(tripletsData);
+
+    // Update Liveblocks after import
+    const room = client.getRoom("triplets-room");
+
     return { success: true, count: importedTriplets.length };
   } catch (error) {
     console.error("Error importing triplets:", error);
@@ -74,12 +91,14 @@ export async function importTriplets(
 }
 
 export async function updateTripletStatus(
-  prevState: TUpdateTripletStatusState,
-  formData: FormData
-) {
-  const tripletId = formData.get("id") as string;
-  const newStatus = formData.get("status") as "accepted" | "rejected";
+  prevState: {
+    success: boolean;
+    error?: string;
+    tripletId?: string;
+  } | null,
 
+  { tripletId, newStatus }: { tripletId: string; newStatus: string }
+) {
   await dbConnect();
 
   try {
@@ -88,7 +107,26 @@ export async function updateTripletStatus(
       { status: newStatus },
       { new: true }
     );
-    return { success: true, tripletId: JSONify<TTriplet>(updatedTriplet)._id };
+
+    // Update Liveblocks
+    const room = client.getRoom("triplets-room");
+
+    if (!room) {
+      return { success: false, error: "Room not found" };
+    }
+
+    const storage = await room.getStorage();
+    const triplets = storage.root.get("triplets") || [];
+
+    const index = triplets.findIndex(
+      (t: TTriplet) => t._id === updatedTriplet._id
+    );
+
+    if (index !== -1) {
+      triplets.set(index, JSONify<TTriplet>(updatedTriplet));
+    }
+
+    return { success: true, tripletId: updatedTriplet._id };
   } catch (error) {
     console.error("Error updating triplet status:", error);
     return { success: false, error: "Failed to update triplet status" };
@@ -96,25 +134,74 @@ export async function updateTripletStatus(
 }
 
 export async function editTriplet(
-  prevState: TEditTripletState,
-  formData: FormData
+  prevState: {
+    success: boolean;
+    error?: string;
+    triplet?: TTriplet;
+  } | null,
+  {
+    tripletId,
+    instruction,
+    input,
+    output,
+  }: { tripletId: string; instruction: string; input: string; output: string }
 ) {
-  const id = formData.get("id") as string;
-  const instruction = formData.get("instruction") as string;
-  const input = formData.get("input") as string;
-  const output = formData.get("output") as string;
-
   await dbConnect();
 
   try {
     const updatedTriplet = await Triplet.findByIdAndUpdate(
-      id,
-      { instruction, input, output, status: "accepted" },
+      tripletId,
+      { instruction, input, output },
       { new: true }
     );
+
+    // Update Liveblocks
+
+    const room = client.getRoom("triplets-room");
+
+    if (!room) {
+      return { success: false, error: "Room not found" };
+    }
+
+    const storage = await room.getStorage();
+    const triplets = storage.root.get("triplets") || [];
+
+    const index = triplets.findIndex(
+      (t: TTriplet) => t._id === updatedTriplet._id
+    );
+
+    if (index !== -1) {
+      triplets.set(index, JSONify<TTriplet>(updatedTriplet));
+    }
+
     return { success: true, triplet: JSONify<TTriplet>(updatedTriplet) };
   } catch (error) {
     console.error("Error editing triplet:", error);
     return { success: false, error: "Failed to edit triplet" };
   }
+}
+
+export async function fetchTriplets(): Promise<TTriplet[]> {
+  await dbConnect();
+  const triplets = await Triplet.find({});
+  return JSONify<TTriplet[]>(triplets);
+}
+
+export async function syncTripletsWithLiveblocks(triplets: TTriplet[]) {
+  let room = client.getRoom("triplet-ai");
+  // console.log("from sync", room);
+
+  if (!room) {
+    const { room: enteredRoom } = client.enterRoom("triplet-ai", {
+      initialStorage: { triplets: new LiveList([]) },
+    });
+
+    room = enteredRoom;
+  }
+
+  const storage = await room.getStorage();
+
+  storage.root.set("triplets", new LiveList(triplets));
+
+  return;
 }
