@@ -11,8 +11,8 @@ declare type TTriplet = Omit<TTripletFields, "id"> & {
   _id: string;
   id: string;
   status: "pending" | "accepted" | "rejected";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };
 
 declare type TAddTripletState = {
