@@ -32,7 +32,7 @@ export async function addTriplet(
   await newTriplet.save();
 
   // Update Liveblocks
-  let room = client.getRoom("triplets-room");
+  const room = client.getRoom("triplets-room");
   if (!room) {
     return { success: false, error: "Room not found" };
   }
@@ -68,7 +68,7 @@ export async function importTriplets(
         columns: true,
         skip_empty_lines: true,
       });
-      tripletsData = records.map((record: any) => ({
+      tripletsData = records.map((record: TTriplet) => ({
         instruction: record.instruction,
         input: record.input,
         output: record.output,
@@ -81,7 +81,7 @@ export async function importTriplets(
     const importedTriplets = await Triplet.insertMany(tripletsData);
 
     // Update Liveblocks after import
-    const room = client.getRoom("triplets-room");
+    // const room = client.getRoom("triplets-room");
 
     return { success: true, count: importedTriplets.length };
   } catch (error) {
