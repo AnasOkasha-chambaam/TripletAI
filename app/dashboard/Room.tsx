@@ -1,12 +1,12 @@
 "use client";
 
-import { ReactNode } from "react";
+import { LiveList } from "@liveblocks/client";
 import {
+  ClientSideSuspense,
   LiveblocksProvider,
   RoomProvider,
-  ClientSideSuspense,
 } from "@liveblocks/react/suspense";
-import { LiveList } from "@liveblocks/client";
+import { ReactNode } from "react";
 
 export function Room({
   children,
@@ -25,18 +25,7 @@ export function Room({
     <LiveblocksProvider publicApiKey={publicApiKey}>
       <RoomProvider
         initialStorage={{
-          triplets: new LiveList([
-            {
-              _id: "123123123",
-              id: "123123123",
-              instruction: "Write a triplet",
-              input: "This is a test triplet",
-              output: "This is a test triplet",
-              status: "pending",
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
-          ]),
+          triplets: new LiveList(initialTriplets),
         }}
         id="triplet-ai"
       >
