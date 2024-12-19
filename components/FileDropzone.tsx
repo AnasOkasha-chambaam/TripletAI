@@ -2,7 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { UploadCloud } from "lucide-react";
+import { FileUpIcon, UploadCloud } from "lucide-react";
+import { Badge } from "./ui/badge";
 
 interface FileDropzoneProps {
   onFileAccepted: (file: File) => void;
@@ -41,7 +42,12 @@ export function FileDropzone({ onFileAccepted }: FileDropzoneProps) {
       <input {...getInputProps()} name="file" />
       <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
       {fileName ? (
-        <p className="mt-2 text-sm text-gray-600">{fileName}</p>
+        <Badge
+          className="mt-2 p-1 scale-125 rounded-sm opacity-60"
+          variant={"outline"}
+        >
+          <FileUpIcon className="size-3 mr-1" /> {fileName}
+        </Badge>
       ) : (
         <>
           <p className="mt-2 text-sm text-gray-600">
