@@ -1,22 +1,18 @@
 import AcceptedTriplets from "@/components/AcceptedTriplets";
-import { AddTripletDialog } from "@/components/AddTripletDialog";
+import { AddOrEditTripletDialog } from "@/components/AddOrEditTripletDialog";
 import { ImportTripletsDialog } from "@/components/ImportTripletsDialog";
 import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { syncTripletsWithLiveblocks } from "@/lib/actions/triplet.actions";
+import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
-import {
-  fetchTriplets,
-  syncTripletsWithLiveblocks,
-} from "@/lib/actions/triplet.actions";
-import { CheckIcon, CircleDotIcon, XIcon } from "lucide-react";
 
 export default async function Dashboard() {
-  const triplets = await fetchTriplets();
-  await syncTripletsWithLiveblocks(triplets);
+  await syncTripletsWithLiveblocks();
 
   return (
-    <Room initialTriplets={triplets}>
+    <Room initialTriplets={[]}>
       <div className="min-h-screen overflow-x-hidden">
         <section className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
@@ -25,7 +21,7 @@ export default async function Dashboard() {
             </h2>
             <div className="space-x-4">
               <ImportTripletsDialog />
-              <AddTripletDialog />
+              <AddOrEditTripletDialog />
             </div>
           </div>
           <Tabs defaultValue="pending">
@@ -35,11 +31,11 @@ export default async function Dashboard() {
                 Pending
               </TabsTrigger>
               <TabsTrigger value="accepted">
-                <CheckIcon className="size-4 mr-2 text-green-600" />
+                <CircleCheckIcon className="size-4 mr-2 text-green-600" />
                 Accepted
               </TabsTrigger>
               <TabsTrigger value="rejected">
-                <XIcon className="size-4 mr-2 text-red-600" />
+                <CircleXIcon className="size-4 mr-2 text-red-600" />
                 Rejected
               </TabsTrigger>
             </TabsList>
