@@ -1,15 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   editTriplet,
   updateTripletStatus,
@@ -19,10 +9,10 @@ import { motion, PanInfo, useAnimation } from "framer-motion";
 import { ArrowDown, CheckCircle, Edit, XCircle } from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
-import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
