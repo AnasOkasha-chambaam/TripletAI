@@ -24,7 +24,10 @@ export function ImportTripletsDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [state, formAction, isPending] = useActionState(importTriplets, null);
+  const [state, importTripletsAction, isPending] = useActionState(
+    importTriplets,
+    null
+  );
 
   const handleFileAccepted = (acceptedFile: File) => {
     setFile(acceptedFile);
@@ -36,7 +39,7 @@ export function ImportTripletsDialog({
 
     const formData = new FormData();
     formData.append("file", file);
-    startTransition(() => formAction(formData));
+    startTransition(() => importTripletsAction(formData));
   };
 
   useEffect(() => {
