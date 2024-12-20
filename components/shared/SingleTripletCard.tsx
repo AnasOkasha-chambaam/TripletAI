@@ -77,16 +77,14 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
       </div>
       <Separator />
       <CardContent className="p-6 flex items-center justify-between">
-        <div>
+        <div className="w-full">
           <p className="text-sm text-foreground/40">{triplet.instruction}</p>
           {triplet.input && triplet.input.length > 0 ? (
             <h3 className="mb-4 text-2xl font-bold">{triplet.input}</h3>
           ) : (
             <h3 className="mb-4 text-xl font-bold opacity-25">Empty</h3>
           )}
-          <p className="mb-4 p-2 pl-5 bg-muted/15 border-l-4">
-            {triplet.output}
-          </p>
+          <p className="mb-4 p-2 pl-5 bg-muted border-l-4">{triplet.output}</p>
         </div>
       </CardContent>
     </Card>
