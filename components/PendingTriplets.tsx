@@ -12,6 +12,8 @@ import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
+import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
+import { Separator } from "./ui/separator";
 
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
@@ -110,67 +112,104 @@ export default function PendingTriplets() {
 
   return (
     <>
-      <div className="flex justify-center items-center my-4">
-        <Badge className="mx-auto scale-110">
-          <span className="underline mr-1">{pendingTriplets.length}</span>{" "}
-          Pending Triplets
-        </Badge>
-      </div>
-
-      <div
-        className={cn(
-          "relative flex flex-col justify-center items-center gap-3",
-          {
-            "pointer-events-none": isEditDisabled,
-          }
-        )}
-      >
-        <motion.div
-          drag
-          dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-          onDragEnd={handleDragEnd}
-          animate={controls}
-          className="relative z-10"
-        >
-          <SingleTripletCard
-            triplet={currentTriplet}
-            isActionPending={isUpdateActionPending}
-          />
-        </motion.div>
-        {/* Swipe direction icons */}
-        <motion.div
-          className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2"
-          animate={iconControls.right}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <CheckCircle className="w-12 h-12 text-green-500" />
-        </motion.div>
-        <motion.div
-          className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2"
-          animate={iconControls.left}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <XCircle className="w-12 h-12 text-red-500" />
-        </motion.div>
-        <motion.div
-          className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full"
-          animate={iconControls.up}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <Edit className="w-12 h-12 text-blue-500" />
-        </motion.div>
-        <motion.div
-          className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
-          animate={iconControls.down}
-          initial={{ opacity: 0, scale: 1 }}
-        >
-          <ArrowDown className="w-12 h-12 text-yellow-500" />
-        </motion.div>
-        <AddOrEditTripletDialog
-          triplet={currentTriplet}
-          openExternal={isEditModalOpen}
-          setOpenExternal={setIsEditModalOpen}
+      <div className="relative flex flex-row max-md:flex-col-reverse justify-center items-center gap-3">
+        <EmblaCarouselClassNames
+          slides={[
+            {
+              idx: 0,
+              lockedBy: {
+                picture: "https://placehold.co/600x400.png?text=No+Image",
+                name: "Test User 01",
+              },
+            },
+            {
+              idx: 1,
+              lockedBy: {
+                picture: "https://placehold.co/600x400.png?text=No+Image",
+                name: "Test User 02",
+              },
+            },
+            {
+              idx: 2,
+              lockedBy: {
+                picture: "https://placehold.co/600x400.png?text=No+Image",
+                name: "Test User 03",
+              },
+            },
+            {
+              idx: 3,
+              lockedBy: {
+                picture: "",
+                name: "Test User 04",
+              },
+            },
+          ]}
         />
+        <Separator className="h-96 max-md:hidden" orientation="vertical" />
+        <Separator className="w-96 md:hidden" orientation="horizontal" />
+        <div className=" w-full">
+          <div className="flex justify-center items-center my-6">
+            <Badge className="mx-auto scale-110">
+              <span className="underline mr-1">{pendingTriplets.length}</span>{" "}
+              Pending Triplets
+            </Badge>
+          </div>
+          <div
+            className={cn(
+              "relative flex flex-row justify-center items-center gap-3",
+              {
+                "pointer-events-none": isEditDisabled,
+              }
+            )}
+          >
+            <motion.div
+              drag
+              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              onDragEnd={handleDragEnd}
+              animate={controls}
+              className="relative z-10"
+            >
+              <SingleTripletCard
+                triplet={currentTriplet}
+                isActionPending={isUpdateActionPending}
+              />
+            </motion.div>
+            {/* Swipe direction icons */}
+            <motion.div
+              className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2"
+              animate={iconControls.right}
+              initial={{ opacity: 0, scale: 1 }}
+            >
+              <CheckCircle className="w-12 h-12 text-green-500" />
+            </motion.div>
+            <motion.div
+              className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2"
+              animate={iconControls.left}
+              initial={{ opacity: 0, scale: 1 }}
+            >
+              <XCircle className="w-12 h-12 text-red-500" />
+            </motion.div>
+            <motion.div
+              className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full"
+              animate={iconControls.up}
+              initial={{ opacity: 0, scale: 1 }}
+            >
+              <Edit className="w-12 h-12 text-blue-500" />
+            </motion.div>
+            <motion.div
+              className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
+              animate={iconControls.down}
+              initial={{ opacity: 0, scale: 1 }}
+            >
+              <ArrowDown className="w-12 h-12 text-yellow-500" />
+            </motion.div>
+            <AddOrEditTripletDialog
+              triplet={currentTriplet}
+              openExternal={isEditModalOpen}
+              setOpenExternal={setIsEditModalOpen}
+            />
+          </div>
+        </div>
       </div>
     </>
   );

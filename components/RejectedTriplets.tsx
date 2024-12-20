@@ -54,14 +54,15 @@ export default function RejectedTriplets() {
 
   return (
     <div>
-      {triplets.map((triplet) => (
-        <SingleTripletCard
-          key={triplet._id}
-          triplet={triplet}
-          onEdit={() => handleEditAndAccept(triplet)}
-        />
-      ))}
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {triplets.map((triplet) => (
+          <SingleTripletCard
+            key={triplet._id}
+            triplet={triplet}
+            onEdit={() => handleEditAndAccept(triplet)}
+          />
+        ))}
+      </div>
       <Dialog
         open={!!editingTriplet}
         onOpenChange={() => setEditingTriplet(null)}
