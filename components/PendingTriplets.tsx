@@ -22,9 +22,10 @@ import { toast } from "sonner";
 import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
+import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 
 export default function PendingTriplets() {
-  const { triplets, updateTriplet, removeTriplet } = useRealtimeTriplets();
+  const { triplets } = useRealtimeTriplets();
 
   const pendingTriplets = triplets.filter((t) => t.status === "pending");
   const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
@@ -57,15 +58,13 @@ export default function PendingTriplets() {
 
   useEffect(() => {
     if (updateState?.success) {
-      removeTriplet(updateState.tripletId!);
       toast.success("Triplet status updated successfully");
     }
     if (editState?.success) {
       setIsEditModalOpen(false);
-      updateTriplet(editState.triplet!);
       toast.success("Triplet edited successfully");
     }
-  }, [updateState, editState, removeTriplet, updateTriplet]);
+  }, [updateState, editState]);
 
   const handleSwipe = async (direction: string) => {
     if (!currentTriplet) return;
@@ -83,8 +82,7 @@ export default function PendingTriplets() {
         return;
       case "down":
         // Move to bottom of the list
-        removeTriplet(currentTriplet._id);
-        updateTriplet({ ...currentTriplet, status: "pending" });
+
         return;
     }
 
@@ -187,80 +185,38 @@ export default function PendingTriplets() {
         </motion.div>
         {/* Swipe direction icons */}
         <motion.div
-          className="absolute top-1/2 right-0 transform translate-x-full -translate-y-1/2"
+          className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2"
           animate={iconControls.right}
           initial={{ opacity: 0, scale: 1 }}
         >
           <CheckCircle className="w-12 h-12 text-green-500" />
         </motion.div>
         <motion.div
-          className="absolute top-1/2 left-0 transform -translate-x-full -translate-y-1/2"
+          className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2"
           animate={iconControls.left}
           initial={{ opacity: 0, scale: 1 }}
         >
           <XCircle className="w-12 h-12 text-red-500" />
         </motion.div>
         <motion.div
-          className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full"
+          className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full"
           animate={iconControls.up}
           initial={{ opacity: 0, scale: 1 }}
         >
           <Edit className="w-12 h-12 text-blue-500" />
         </motion.div>
         <motion.div
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
+          className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
           animate={iconControls.down}
           initial={{ opacity: 0, scale: 1 }}
         >
           <ArrowDown className="w-12 h-12 text-yellow-500" />
         </motion.div>
-        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Triplet</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleEditSubmit}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="instruction" className="text-right">
-                    Instruction
-                  </Label>
-                  <Input
-                    id="instruction"
-                    name="instruction"
-                    defaultValue={currentTriplet.instruction}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="input" className="text-right">
-                    Input
-                  </Label>
-                  <Input
-                    id="input"
-                    name="input"
-                    defaultValue={currentTriplet.input}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="output" className="text-right">
-                    Output
-                  </Label>
-                  <Input
-                    id="output"
-                    name="output"
-                    defaultValue={currentTriplet.output}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Save changes</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <AddOrEditTripletDialog
+          triplet={currentTriplet}
+          openExternal={isEditModalOpen}
+          setOpenExternal={setIsEditModalOpen}
+        />
       </div>
     </>
   );
