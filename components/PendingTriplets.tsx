@@ -107,22 +107,6 @@ export default function PendingTriplets() {
     );
   };
 
-  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!currentTriplet) return;
-
-    const formData = new FormData(event.currentTarget);
-    formData.set("id", currentTriplet._id);
-    startTransition(() => {
-      editAction({
-        tripletId: currentTriplet._id,
-        instruction: formData.get("instruction") as string,
-        input: formData.get("input") as string,
-        output: formData.get("output") as string,
-      });
-    });
-  };
-
   if (!currentTriplet) {
     return (
       <div className="flex justify-center items-center my-4">
