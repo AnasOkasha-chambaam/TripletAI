@@ -31,10 +31,6 @@ export default function PendingTriplets() {
     updateTripletStatus,
     null
   );
-  const [editState, editAction, isEditActionPending] = useActionState(
-    editTriplet,
-    null
-  );
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -50,11 +46,7 @@ export default function PendingTriplets() {
     if (updateState?.success) {
       toast.success("Triplet status updated successfully");
     }
-    if (editState?.success) {
-      setIsEditModalOpen(false);
-      toast.success("Triplet edited successfully");
-    }
-  }, [updateState, editState]);
+  }, [updateState]);
 
   const handleSwipe = async (direction: string) => {
     if (!currentTriplet) return;
@@ -115,7 +107,7 @@ export default function PendingTriplets() {
     );
   }
 
-  const isEditDisabled = isEditActionPending || isUpdateActionPending;
+  const isEditDisabled = isUpdateActionPending;
 
   return (
     <>
@@ -144,7 +136,7 @@ export default function PendingTriplets() {
         >
           <SingleTripletCard
             triplet={currentTriplet}
-            isActionPending={isUpdateActionPending || isEditActionPending}
+            isActionPending={isUpdateActionPending}
           />
           {/* <Card className="w-full max-w-md mx-auto">
           <CardContent className="p-6">
