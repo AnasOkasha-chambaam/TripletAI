@@ -1,4 +1,4 @@
-// /components/shared/Footer.tsx
+// /components/theme-provider.tsx
 
 "use client";
 
