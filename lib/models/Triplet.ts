@@ -1,3 +1,5 @@
+// /lib/models/Triplet.ts
+
 import mongoose from "mongoose";
 
 const TripletSchema = new mongoose.Schema(

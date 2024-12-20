@@ -1,3 +1,5 @@
+// /app/dashboard/Room.tsx
+
 "use client";
 
 import { LiveList } from "@liveblocks/client";

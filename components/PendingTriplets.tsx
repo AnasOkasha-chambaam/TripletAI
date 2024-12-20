@@ -1,3 +1,5 @@
+// /components/PendingTriplets.tsx
+
 "use client";
 
 import { updateTripletStatus } from "@/lib/actions/triplet.actions";

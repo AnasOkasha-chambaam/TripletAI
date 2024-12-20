@@ -1,3 +1,5 @@
+// /components/shared/Header.tsx
+
 import { Navbar } from "./Navbar";
 
 interface HeaderProps {

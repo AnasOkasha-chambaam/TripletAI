@@ -1,3 +1,5 @@
+// /components/shared/SingleTripletCard.tsx
+
 import { Button } from "@/components/ui/button";
 import {
   Card,

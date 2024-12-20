@@ -1,3 +1,5 @@
+// /app/dashboard/page.tsx
+
 import AcceptedTriplets from "@/components/AcceptedTriplets";
 import { AddOrEditTripletDialog } from "@/components/AddOrEditTripletDialog";
 import { ImportTripletsDialog } from "@/components/ImportTripletsDialog";

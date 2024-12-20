@@ -1,3 +1,5 @@
+// /types/index.d.ts
+
 /* TRIPLETS */
 
 declare type TTripletFields = {

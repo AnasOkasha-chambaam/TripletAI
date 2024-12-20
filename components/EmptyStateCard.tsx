@@ -1,3 +1,5 @@
+// /components/EmptyStateCard.tsx
+
 import {
   Card,
   CardContent,

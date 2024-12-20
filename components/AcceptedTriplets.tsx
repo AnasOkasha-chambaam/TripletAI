@@ -1,3 +1,5 @@
+// /components/AcceptedTriplets.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";

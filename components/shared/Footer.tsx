@@ -1,3 +1,5 @@
+// /components/shared/Footer.tsx
+
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border">

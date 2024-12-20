@@ -1,3 +1,5 @@
+// /components/shared/Footer.tsx
+
 "use client";
 
 import * as React from "react";
