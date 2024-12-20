@@ -12,15 +12,11 @@ const client = createClient({
 
 export async function addTriplet(
   prevState: TAddTripletState | null,
-  formData: FormData
-) {
+  { instruction, input, output }: TTripletFields
+): Promise<TAddTripletState> {
   await dbConnect();
 
-  const instruction = formData.get("instruction") as string;
-  const input = formData.get("input") as string;
-  const output = formData.get("output") as string;
-
-  console.log("adding triplet: ", { instruction, input, output });
+  // console.log("adding triplet: ", { instruction, input, output });
 
   const newTriplet = new Triplet({
     instruction,
@@ -32,16 +28,7 @@ export async function addTriplet(
   await newTriplet.save();
 
   // Update Liveblocks
-  const room = client.getRoom("triplets-room");
-  if (!room) {
-    return { success: false, error: "Room not found" };
-  }
-  const storage = await room.getStorage();
-  const triplets = storage.root.get("triplets") || [];
-
-  triplets.push(JSONify<TTriplet>(newTriplet));
-
-  storage.root.set("triplets", triplets);
+  await syncTripletsWithLiveblocks();
 
   return { success: true, triplet: JSONify<TTriplet>(newTriplet) };
 }
@@ -81,7 +68,7 @@ export async function importTriplets(
     const importedTriplets = await Triplet.insertMany(tripletsData);
 
     // Update Liveblocks after import
-    // const room = client.getRoom("triplets-room");
+    await syncTripletsWithLiveblocks();
 
     return { success: true, count: importedTriplets.length };
   } catch (error) {
@@ -109,24 +96,9 @@ export async function updateTripletStatus(
     );
 
     // Update Liveblocks
-    const room = client.getRoom("triplets-room");
+    await syncTripletsWithLiveblocks();
 
-    if (!room) {
-      return { success: false, error: "Room not found" };
-    }
-
-    const storage = await room.getStorage();
-    const triplets = storage.root.get("triplets") || [];
-
-    const index = triplets.findIndex(
-      (t: TTriplet) => t._id === updatedTriplet._id
-    );
-
-    if (index !== -1) {
-      triplets.set(index, JSONify<TTriplet>(updatedTriplet));
-    }
-
-    return { success: true, tripletId: updatedTriplet._id };
+    return { success: true, tripletId: JSONify<string>(updatedTriplet._id) };
   } catch (error) {
     console.error("Error updating triplet status:", error);
     return { success: false, error: "Failed to update triplet status" };
@@ -151,28 +123,12 @@ export async function editTriplet(
   try {
     const updatedTriplet = await Triplet.findByIdAndUpdate(
       tripletId,
-      { instruction, input, output },
+      { instruction, input, output, status: "accepted" },
       { new: true }
     );
 
     // Update Liveblocks
-
-    const room = client.getRoom("triplets-room");
-
-    if (!room) {
-      return { success: false, error: "Room not found" };
-    }
-
-    const storage = await room.getStorage();
-    const triplets = storage.root.get("triplets") || [];
-
-    const index = triplets.findIndex(
-      (t: TTriplet) => t._id === updatedTriplet._id
-    );
-
-    if (index !== -1) {
-      triplets.set(index, JSONify<TTriplet>(updatedTriplet));
-    }
+    await syncTripletsWithLiveblocks();
 
     return { success: true, triplet: JSONify<TTriplet>(updatedTriplet) };
   } catch (error) {
@@ -187,21 +143,29 @@ export async function fetchTriplets(): Promise<TTriplet[]> {
   return JSONify<TTriplet[]>(triplets);
 }
 
-export async function syncTripletsWithLiveblocks(triplets: TTriplet[]) {
+export async function syncTripletsWithLiveblocks() {
+  const triplets = await fetchTriplets();
+
   let room = client.getRoom("triplet-ai");
+  let leave = () => {};
   // console.log("from sync", room);
 
   if (!room) {
-    const { room: enteredRoom } = client.enterRoom("triplet-ai", {
-      initialStorage: { triplets: new LiveList([]) },
-    });
+    const { room: enteredRoom, leave: leaveEnteredRoom } = client.enterRoom(
+      "triplet-ai",
+      {
+        initialStorage: { triplets: new LiveList([]) },
+      }
+    );
 
     room = enteredRoom;
+    leave = leaveEnteredRoom;
   }
 
   const storage = await room.getStorage();
 
   storage.root.set("triplets", new LiveList(triplets));
 
+  leave();
   return;
 }
