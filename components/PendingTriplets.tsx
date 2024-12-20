@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  editTriplet,
-  updateTripletStatus,
-} from "@/lib/actions/triplet.actions";
+import { updateTripletStatus } from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
 import { motion, PanInfo, useAnimation } from "framer-motion";
 import { ArrowDown, CheckCircle, Edit, XCircle } from "lucide-react";
@@ -138,16 +135,6 @@ export default function PendingTriplets() {
             triplet={currentTriplet}
             isActionPending={isUpdateActionPending}
           />
-          {/* <Card className="w-full max-w-md mx-auto">
-          <CardContent className="p-6">
-            <h3 className="font-bold mb-2">Instruction:</h3>
-            <p className="mb-4">{currentTriplet.instruction}</p>
-            <h3 className="font-bold mb-2">Input:</h3>
-            <p className="mb-4">{currentTriplet.input}</p>
-            <h3 className="font-bold mb-2">Output:</h3>
-            <p>{currentTriplet.output}</p>
-          </CardContent>
-        </Card> */}
         </motion.div>
         {/* Swipe direction icons */}
         <motion.div
