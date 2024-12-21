@@ -1,24 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TripletAI
 
-## Getting Started
+TripletAI is an application designed to handle Supervised Learning Triplets. It provides an intuitive platform to efficiently manage and curate your supervised learning triplets.
 
-First, run the development server:
+## Purpose
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The purpose of TripletAI is to streamline the process of managing supervised learning triplets, ensuring that no two actions from different users are taken on the same triplet simultaneously. This is achieved through real-time updates and locking mechanisms.
+
+## Functionality
+
+- **Add or Edit Triplets**: Users can add new triplets or edit existing ones.
+- **View Locked Triplets**: Users can view triplets that are locked by other users to avoid conflicts.
+- **Real-time Updates**: The application uses `socket.io` for real-time updates to ensure that all users have the latest information.
+- **Embla Carousel**: The application uses the Embla Carousel to display triplets in a user-friendly manner.
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (>= 18.18)
+- npm or yarn or pnpm
+
+### Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/yourusername/tripletai.git
+   cd tripletai
+   ```
+
+2. Install dependencies:
+
+   ```sh
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+3. Create a `.env` file in the root directory and add the necessary environment variables:
+
+```env
+NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=your_liveblocks_public_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```sh
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Standout Features
+
+- **Real-time Updates**: The application uses `liveblocks` to provide real-time updates, ensuring that all users have the latest information.
+- **Embla Carousel**: The application uses the Embla Carousel to display triplets in a user-friendly manner.
+- **Locking Mechanism**: The application ensures that no two actions from different users are taken on the same triplet simultaneously by locking triplets that are being edited.
 
 ## Learn More
 
