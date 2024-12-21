@@ -25,7 +25,7 @@ The purpose of TripletAI is to streamline the process of managing supervised lea
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/yourusername/tripletai.git
+   git clone https://github.com/AnasOkasha-chambaam/TripletAI
    cd tripletai
    ```
 
@@ -42,7 +42,17 @@ The purpose of TripletAI is to streamline the process of managing supervised lea
 3. Create a `.env` file in the root directory and add the necessary environment variables:
 
 ```env
-NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=your_liveblocks_public_key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY=YOUR_CLERK_SECRET_KEY
+
+ALLOWED_EMAILS=YOUR_EMAIL
+
+MONGODB_URI=YOUR_MONGODB_URI
+
+WEBHOOK_SECRET=YOUR_WEBHOOK_SECRET
+
+NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=YOUR_LIVEBLOCKS_PUBLIC_KEY
+
 ```
 
 4. Run the development server:
