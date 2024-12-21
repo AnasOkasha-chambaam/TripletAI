@@ -1,25 +1,27 @@
-// /components/PendingTriplets.tsx
-
 "use client";
 
 import { updateTripletStatus } from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
+import { shallow, useUpdateMyPresence } from "@liveblocks/react";
+import { useOthersMapped } from "@liveblocks/react/suspense";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { ArrowDown, CheckCircle, Edit, XCircle } from "lucide-react";
+import { ArrowDown, CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
+import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
 import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
-import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
 import { Separator } from "./ui/separator";
 
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
 
-  const pendingTriplets = triplets.filter((t) => t.status === "pending");
   const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
+
+  const updateMyPresence = useUpdateMyPresence();
+
   const controls = useAnimation();
   const iconControls = {
     right: useAnimation(),
@@ -35,13 +37,37 @@ export default function PendingTriplets() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const lockedTripletsMapped = useOthersMapped(
+    (other) => ({
+      triplet: other.presence.lockedTriplet,
+      lockedBy: other.presence.user,
+    }),
+    shallow
+  );
+
+  const lockedTriplets = Array.from(lockedTripletsMapped)
+    .filter((lt) => lt[1].triplet)
+    .map((lt) => lt[1]) as TLockedTriplet[];
+
+  const pendingTriplets = triplets.filter((t) => t.status === "pending");
+
+  const availableTriplets = pendingTriplets.filter(
+    (t) => !lockedTriplets.find((lt) => lt.triplet._id === t._id)
+  );
+
   useEffect(() => {
-    if (pendingTriplets.length > 0) {
-      setCurrentTriplet(pendingTriplets[0]);
+    updateMyPresence({
+      lockedTriplet: currentTriplet,
+    });
+  }, [currentTriplet]);
+
+  useEffect(() => {
+    if (availableTriplets.length > 0) {
+      setCurrentTriplet(availableTriplets[0]);
     } else {
       setCurrentTriplet(null);
     }
-  }, [pendingTriplets]);
+  }, [availableTriplets]);
 
   useEffect(() => {
     if (updateState?.success) {
@@ -100,7 +126,7 @@ export default function PendingTriplets() {
     );
   };
 
-  if (!currentTriplet) {
+  if (pendingTriplets?.length === 0) {
     return (
       <div className="flex justify-center items-center my-4">
         <Badge className="mx-auto scale-110">No Pending Triplets</Badge>
@@ -113,38 +139,18 @@ export default function PendingTriplets() {
   return (
     <>
       <div className="relative flex flex-row max-md:flex-col-reverse justify-center items-center gap-3">
-        <EmblaCarouselClassNames
-          slides={[
-            {
-              idx: 0,
-              lockedBy: {
-                picture: "https://placehold.co/600x400.png?text=No+Image",
-                name: "Test User 01",
-              },
-            },
-            {
-              idx: 1,
-              lockedBy: {
-                picture: "https://placehold.co/600x400.png?text=No+Image",
-                name: "Test User 02",
-              },
-            },
-            {
-              idx: 2,
-              lockedBy: {
-                picture: "https://placehold.co/600x400.png?text=No+Image",
-                name: "Test User 03",
-              },
-            },
-            {
-              idx: 3,
-              lockedBy: {
-                picture: "",
-                name: "Test User 04",
-              },
-            },
-          ]}
-        />
+        {lockedTriplets.length > 0 ? (
+          <EmblaCarouselClassNames slides={lockedTriplets} />
+        ) : (
+          <div className="flex justify-center items-center my-4 min-w-60">
+            <Badge
+              className="mx-auto scale-110 p-3 rounded-md"
+              variant={"secondary"}
+            >
+              <InfoIcon className="mr-2 size-4" /> No Locked Triplets
+            </Badge>
+          </div>
+        )}
         <Separator className="h-96 max-md:hidden" orientation="vertical" />
         <Separator className="w-96 md:hidden" orientation="horizontal" />
         <div className=" w-full">
@@ -154,61 +160,72 @@ export default function PendingTriplets() {
               Pending Triplets
             </Badge>
           </div>
-          <div
-            className={cn(
-              "relative flex flex-row justify-center items-center gap-3",
-              {
-                "pointer-events-none": isEditDisabled,
-              }
-            )}
-          >
-            <motion.div
-              drag
-              dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              onDragEnd={handleDragEnd}
-              animate={controls}
-              className="relative z-10"
+          {currentTriplet ? (
+            <div
+              className={cn(
+                "relative flex flex-row justify-center items-center gap-3",
+                {
+                  "pointer-events-none": isEditDisabled,
+                }
+              )}
             >
-              <SingleTripletCard
+              <motion.div
+                drag
+                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                onDragEnd={handleDragEnd}
+                animate={controls}
+                className="relative z-10 group"
+              >
+                <SingleTripletCard
+                  triplet={currentTriplet}
+                  isActionPending={isUpdateActionPending}
+                />
+                {/* Swipe direction icons */}
+                <motion.div
+                  className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  animate={iconControls.right}
+                  initial={{ opacity: 0, scale: 1 }}
+                >
+                  <CheckCircle className="w-12 h-12 text-green-500" />
+                </motion.div>
+                <motion.div
+                  className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  animate={iconControls.left}
+                  initial={{ opacity: 0, scale: 1 }}
+                >
+                  <XCircle className="w-12 h-12 text-red-500" />
+                </motion.div>
+                <motion.div
+                  className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  animate={iconControls.up}
+                  initial={{ opacity: 0, scale: 1 }}
+                >
+                  <Edit className="w-12 h-12 text-blue-500" />
+                </motion.div>
+                <motion.div
+                  className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  animate={iconControls.down}
+                  initial={{ opacity: 0, scale: 1 }}
+                >
+                  <ArrowDown className="w-12 h-12 text-yellow-500" />
+                </motion.div>
+              </motion.div>
+              <AddOrEditTripletDialog
                 triplet={currentTriplet}
-                isActionPending={isUpdateActionPending}
+                openExternal={isEditModalOpen}
+                setOpenExternal={setIsEditModalOpen}
               />
-            </motion.div>
-            {/* Swipe direction icons */}
-            <motion.div
-              className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2"
-              animate={iconControls.right}
-              initial={{ opacity: 0, scale: 1 }}
-            >
-              <CheckCircle className="w-12 h-12 text-green-500" />
-            </motion.div>
-            <motion.div
-              className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2"
-              animate={iconControls.left}
-              initial={{ opacity: 0, scale: 1 }}
-            >
-              <XCircle className="w-12 h-12 text-red-500" />
-            </motion.div>
-            <motion.div
-              className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full"
-              animate={iconControls.up}
-              initial={{ opacity: 0, scale: 1 }}
-            >
-              <Edit className="w-12 h-12 text-blue-500" />
-            </motion.div>
-            <motion.div
-              className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
-              animate={iconControls.down}
-              initial={{ opacity: 0, scale: 1 }}
-            >
-              <ArrowDown className="w-12 h-12 text-yellow-500" />
-            </motion.div>
-            <AddOrEditTripletDialog
-              triplet={currentTriplet}
-              openExternal={isEditModalOpen}
-              setOpenExternal={setIsEditModalOpen}
-            />
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center my-4">
+              <Badge
+                className="mx-auto scale-110 p-3 rounded-md"
+                variant={"secondary"}
+              >
+                <InfoIcon className="mr-2 size-4" /> No Available Triplets
+              </Badge>
+            </div>
+          )}
         </div>
       </div>
     </>

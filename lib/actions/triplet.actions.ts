@@ -1,16 +1,22 @@
-// /actions/triplet.actions.ts
-
 "use server";
+// /actions/triplet.actions.ts
 
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
-import { JSONify } from "../utils";
-import { parse } from "csv-parse/sync";
 import { createClient, LiveList } from "@liveblocks/client";
+import { parse } from "csv-parse/sync";
+import { JSONify } from "../utils";
+import { getInitialPresence } from "./presence.actions";
 
 const client = createClient({
   publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
 });
+
+export async function getTripletById(tripletId: string) {
+  await dbConnect();
+  const triplet = await Triplet.findById(tripletId);
+  return JSONify<TTriplet>(triplet);
+}
 
 export async function addTriplet(
   prevState: TAddTripletState | null,
@@ -153,10 +159,15 @@ export async function syncTripletsWithLiveblocks() {
   // console.log("from sync", room);
 
   if (!room) {
+    const initialPresence = await getInitialPresence();
+
     const { room: enteredRoom, leave: leaveEnteredRoom } = client.enterRoom(
       "triplet-ai",
       {
-        initialStorage: { triplets: new LiveList([]) },
+        initialStorage: {
+          triplets: new LiveList([]),
+        },
+        initialPresence,
       }
     );
 

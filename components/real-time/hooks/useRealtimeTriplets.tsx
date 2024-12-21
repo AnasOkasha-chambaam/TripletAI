@@ -29,6 +29,7 @@ export function useRealtimeTriplets() {
 
   return {
     triplets: triplets ? Array.from(triplets) : [],
+    // pendingTriplets: pendingTriplets ? Array.from(pendingTriplets) : [],
     updateTriplet,
     addTriplet,
     removeTriplet,

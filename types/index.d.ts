@@ -1,5 +1,14 @@
 // /types/index.d.ts
 
+/* MONGODB */
+
+declare type TMongoDBItem = {
+  _id: string;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /* TRIPLETS */
 
 declare type TTripletFields = {
@@ -9,13 +18,21 @@ declare type TTripletFields = {
   output: string;
 };
 
-declare type TTriplet = Omit<TTripletFields, "id"> & {
-  _id: string;
+declare type TLockedBy = {
   id: string;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: string;
-  updatedAt: string;
+  picture: string;
+  username: string;
 };
+
+declare type TLockedTriplet = {
+  triplet: TTriplet;
+  lockedBy: TLockedBy;
+};
+
+declare type TTriplet = Omit<TTripletFields, "id"> &
+  TMongoDBItem & {
+    status: "pending" | "accepted" | "rejected";
+  };
 
 declare type TAddTripletState = {
   success: boolean;
@@ -39,4 +56,28 @@ declare type TImportTripletsState = {
   success: boolean;
   count?: number;
   error?: string;
+};
+
+/* USER */
+
+declare type TUserMeta = {
+  id: string;
+
+  clerkId: string;
+  email: string;
+  username: string;
+  picture: string;
+};
+
+declare type TUser = TMongoDBItem & {
+  clerkId: string;
+  email: string;
+  username: string;
+  picture: string;
+};
+
+/* Liveblocks */
+declare type TLiveblocksPresence = {
+  user: TLockedBy | null;
+  lockedTriplet: TLockedTriplet | null;
 };

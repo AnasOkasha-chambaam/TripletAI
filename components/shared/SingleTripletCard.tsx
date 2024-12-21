@@ -16,10 +16,7 @@ import React from "react";
 
 interface TripletCardProps {
   triplet: TTriplet;
-  lockedBy?: {
-    name: string;
-    picture: string;
-  };
+  lockedBy?: TLockedBy;
   isActionPending?: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
@@ -63,7 +60,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
             {isActionPending
               ? "Wait a second"
               : !!lockedBy
-              ? `By: ${lockedBy.name}`
+              ? `By: ${lockedBy.username}`
               : triplet.status === "accepted"
               ? "Select to export"
               : triplet.status === "rejected"

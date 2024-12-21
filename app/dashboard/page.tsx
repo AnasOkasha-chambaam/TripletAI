@@ -9,12 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { syncTripletsWithLiveblocks } from "@/lib/actions/triplet.actions";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
+import { getInitialPresence } from "@/lib/actions/presence.actions";
 
 export default async function Dashboard() {
   await syncTripletsWithLiveblocks();
 
+  const initialPresence = await getInitialPresence();
+
   return (
-    <Room initialTriplets={[]}>
+    <Room initialTriplets={[]} initialPresence={initialPresence}>
       <div className="min-h-screen overflow-x-hidden">
         <section className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">

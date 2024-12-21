@@ -7,7 +7,10 @@ import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
-const allowedEmails = process.env.ALLOWED_EMAILS?.split(",") || [];
+const allowedEmails =
+  process.env.ALLOWED_EMAILS === "*"
+    ? "*"
+    : process.env.ALLOWED_EMAILS?.split(",") || [];
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
@@ -23,7 +26,10 @@ export default clerkMiddleware(async (auth, req) => {
 
     // console.log("user from middleware: ", user);
 
-    if (!allowedEmails.includes(user.emailAddresses[0].emailAddress)) {
+    if (
+      allowedEmails !== "*" &&
+      !allowedEmails.includes(user.emailAddresses[0].emailAddress)
+    ) {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
   }
