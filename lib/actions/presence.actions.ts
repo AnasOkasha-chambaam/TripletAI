@@ -5,7 +5,7 @@ import { getLoggedInUser } from "./user.actions";
 // get initial presence
 export async function getInitialPresence(): Promise<{
   user: TLockedBy | null;
-  lockedTriplet: TLockedTriplet | null;
+  lockedTriplet: TTriplet | null;
 }> {
   const { user: loggedInUser } = await getLoggedInUser();
 
