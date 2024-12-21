@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { shallow, useUpdateMyPresence } from "@liveblocks/react";
 import { useOthersMapped } from "@liveblocks/react/suspense";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { ArrowDown, CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
+import { CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
@@ -169,47 +169,35 @@ export default function PendingTriplets() {
                 }
               )}
             >
-              <motion.div
-                drag
-                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                onDragEnd={handleDragEnd}
-                animate={controls}
-                className="relative z-10 group"
-              >
-                <SingleTripletCard
-                  triplet={currentTriplet}
-                  isActionPending={isUpdateActionPending}
-                />
+              <div className="relative group cursor-grab active:cursor-grabbing">
+                <motion.div
+                  drag
+                  dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                  onDragEnd={handleDragEnd}
+                  animate={controls}
+                  className="relative z-30 group"
+                >
+                  <SingleTripletCard
+                    triplet={currentTriplet}
+                    isActionPending={isUpdateActionPending}
+                  />
+                </motion.div>
+
                 {/* Swipe direction icons */}
-                <motion.div
-                  className="absolute z-30 top-1/2 right-0 transform translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  animate={iconControls.right}
-                  initial={{ opacity: 0, scale: 1 }}
-                >
-                  <CheckCircle className="w-12 h-12 text-green-500" />
-                </motion.div>
-                <motion.div
-                  className="absolute z-30 top-1/2 left-0 transform -translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  animate={iconControls.left}
-                  initial={{ opacity: 0, scale: 1 }}
-                >
-                  <XCircle className="w-12 h-12 text-red-500" />
-                </motion.div>
-                <motion.div
-                  className="absolute z-30 top-0 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  animate={iconControls.up}
-                  initial={{ opacity: 0, scale: 1 }}
-                >
-                  <Edit className="w-12 h-12 text-blue-500" />
-                </motion.div>
-                <motion.div
-                  className="absolute z-30 bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  animate={iconControls.down}
-                  initial={{ opacity: 0, scale: 1 }}
-                >
-                  <ArrowDown className="w-12 h-12 text-yellow-500" />
-                </motion.div>
-              </motion.div>
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-green-700  border-muted border-4 outline-green-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -right-4 transform md:translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity ">
+                  <CheckCircle className="size-5" /> Accept
+                </div>
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-red-700 border-muted border-4 outline-red-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -left-4 transform md:-translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                  <XCircle className="size-5" /> Reject
+                </div>
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-blue-700 border-muted border-4 outline-blue-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -top-4 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                  <Edit className="size-5" /> Edit
+                </div>
+                {/* TODO: Implement `Skip` functionality */}
+                {/* <div className="absolute z-40 md:z-20 size-20 font-bold bg-yellow-700 border-muted border-4 outline-yellow-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -bottom-4 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                  <ArrowDown className="size-5" /> Skip
+                </div> */}
+              </div>
               <AddOrEditTripletDialog
                 triplet={currentTriplet}
                 openExternal={isEditModalOpen}
