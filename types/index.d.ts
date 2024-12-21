@@ -79,5 +79,5 @@ declare type TUser = TMongoDBItem & {
 /* Liveblocks */
 declare type TLiveblocksPresence = {
   user: TLockedBy | null;
-  lockedTriplet: TLockedTriplet | null;
+  lockedTriplet: TTriplet | null;
 };
