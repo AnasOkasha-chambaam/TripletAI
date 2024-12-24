@@ -5,6 +5,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import SingleTripletCard from "@/components/shared/SingleTripletCard";
+import ExportModal from "./ExportModal";
+import { BracesIcon, SheetIcon } from "lucide-react";
 
 export default function AcceptedTriplets() {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
@@ -72,21 +74,29 @@ export default function AcceptedTriplets() {
             ? "Deselect All"
             : "Select All"}
         </Button>
-        <div>
+        <div className="hidden sm:block">
           <Button
             onClick={() => handleExport("json")}
+            variant={"outline"}
             className="mr-2"
             disabled={!selectedTriplets.length}
           >
+            <BracesIcon className="mr-2" />
             Export JSON
           </Button>
           <Button
             onClick={() => handleExport("csv")}
+            variant={"outline"}
             disabled={!selectedTriplets.length}
           >
+            <SheetIcon className="mr-2" />
             Export CSV
           </Button>
         </div>
+        <ExportModal
+          onExport={(format) => handleExport(format as "json" | "csv")}
+          disabled={!selectedTriplets.length}
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {triplets.map((triplet) => (

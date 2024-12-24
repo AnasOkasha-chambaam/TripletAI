@@ -1,81 +1,123 @@
-// /components/shared/Navbar.tsx
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { ThemeToggle } from "../ui/theme-toggle";
 import Logo from "./Logo";
-import { MenuIcon } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
-  //   { href: "/about", label: "About" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const NavLinks = () => (
+    <>
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "inline-flex items-center p-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 sm:border-b-2 border-transparent hover:border-muted transition-colors",
+            {
+              "text-foreground font-semibold border-border sm:border-b-2 max-sm:bg-muted":
+                pathname === item.href,
+            }
+          )}
+          onClick={() => setIsMenuOpen(false)}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </>
+  );
 
   return (
-    <nav className="sticky top-0 inset-x-0 bg-transparent backdrop-blur-lg shadow-md border-b border-border/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-2xl font-bold text-primary">
-                {/* TripletAI */}
-                {/* <Image
-                  src="/logo.svg"
-                  alt="TripletAI"
-                  width={48}
-                  height={48}
-                  className="size-12"
-                /> */}
-                <Logo className="size-12" fill="hsla(var(--primary))" />
-              </Link>
-            </div>
-          </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <SignedIn>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-muted-foreground/70",
-                      {
-                        "border-primary/50 text-foreground/90 font-semibold":
-                          pathname === item.href,
-                      }
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Separator orientation="vertical" className="h-9 max-h-full" />
-                <ThemeToggle />
-                <UserButton />
-              </div>
-            </SignedIn>
-            <SignedOut>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <SignInButton />
-                <Separator orientation="vertical" className="h-9 max-h-full" />
-                <ThemeToggle />
-              </div>
-            </SignedOut>
-          </div>
-          <div className="flex items-center gap-2 sm:hidden">
-            {/* TODO: Create a side sheet for the menu. */}
+    <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between h-16 items-center">
+        <div className="flex items-center">
+          <Link href="/" className="flex-shrink-0">
+            <Logo className="h-8 w-auto sm:h-10" fill="hsl(var(--primary))" />
+          </Link>
+        </div>
+        <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
+          <SignedIn>
+            <NavLinks />
+            <Separator orientation="vertical" className="h-6" />
             <ThemeToggle />
-            <Separator orientation="vertical" className="h-9 max-h-full" />
-          </div>
+            <UserButton />
+          </SignedIn>
+          <SignedOut>
+            <NavLinks />
+            <Separator orientation="vertical" className="h-6" />
+            <ThemeToggle />
+            <SignInButton mode="modal">
+              <Button variant="outline">Sign In</Button>
+            </SignInButton>
+          </SignedOut>
+        </div>
+        <div className="flex items-center gap-2 sm:hidden">
+          <ThemeToggle />
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+          <Separator orientation="vertical" className="h-9" />
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MenuIcon className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="flex flex-col justify-between"
+            >
+              <div className="">
+                <Link href="/" className="rounded-full p-4 w-fit flex mx-auto">
+                  <Logo className="size-10" fill="hsl(var(--primary))" />
+                </Link>
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                  <SheetDescription>
+                    Navigate through TripletAI
+                  </SheetDescription>
+                </SheetHeader>
+                <Separator className="mb-9 mt-1" />
+                <div className="flex flex-col justify-between space-y-4">
+                  <NavLinks />
+                </div>
+              </div>
+              <SignedOut>
+                <SheetFooter className="flex flex-col gap-2">
+                  <>
+                    <Separator />
+                    <SignInButton>
+                      <Button className="w-full">Sign In</Button>
+                    </SignInButton>
+                  </>
+                </SheetFooter>
+              </SignedOut>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

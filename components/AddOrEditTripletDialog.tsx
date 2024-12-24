@@ -84,16 +84,20 @@ export function AddOrEditTripletDialog({
     >
       {!setOpenExternal && (
         <DialogTrigger asChild>
-          <Button>
+          <Button className="group">
             {triplet ? (
               <>
-                <EditIcon className="mr-2x" />
-                Edit Triplet
+                <EditIcon className="sm:mr-2x" />
+                <span className="hidden sm:inline group-hover:inline">
+                  Edit Triplet
+                </span>
               </>
             ) : (
               <>
-                <PlusIcon className="mr-2x" />
-                Add New Triplet
+                <PlusIcon className="sm:mr-2x" />
+                <span className="hidden sm:inline group-hover:inline">
+                  Add New Triplet
+                </span>
               </>
             )}
           </Button>

@@ -1,5 +1,3 @@
-// /components/shared/Header.tsx
-
 import { Navbar } from "./Navbar";
 
 interface HeaderProps {
@@ -9,25 +7,22 @@ interface HeaderProps {
 
 export function Header({ title, description }: HeaderProps) {
   return (
-    <>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Navbar />
-      <header>
-        {(title || description || true) && (
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            {title && (
-              <h1 className="text-3xl font-bold text-muted-foreground">
-                {title}
-              </h1>
-            )}
-
-            {description && (
-              <p className="mt-1 text-sm text-muted-foreground/70">
-                {description}
-              </p>
-            )}
-          </div>
-        )}
-      </header>
-    </>
+      {(title || description) && (
+        <div className="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+          {title && (
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              {title}
+            </h1>
+          )}
+          {description && (
+            <p className="mt-1 text-sm sm:text-base text-muted-foreground">
+              {description}
+            </p>
+          )}
+        </div>
+      )}
+    </header>
   );
 }

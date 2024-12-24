@@ -65,9 +65,11 @@ export function ImportTripletsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <UploadIcon className="mr-2 h-4 w-4" />
-          Import Triplets
+        <Button variant="outline" className="group">
+          <UploadIcon className="sm:mr-2 h-4 w-4 max-sm:rounded-[50%]" />
+          <span className="hidden sm:inline group-hover:inline">
+            Import Triplets
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
