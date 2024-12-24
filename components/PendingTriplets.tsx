@@ -129,7 +129,9 @@ export default function PendingTriplets() {
   if (pendingTriplets?.length === 0) {
     return (
       <div className="flex justify-center items-center my-4">
-        <Badge className="mx-auto scale-110">No Pending Triplets</Badge>
+        <Badge className="mx-auto scale-110 p-3 rounded-md" variant={"outline"}>
+          <InfoIcon className="mr-2 size-4" /> No Pending Triplets
+        </Badge>
       </div>
     );
   }

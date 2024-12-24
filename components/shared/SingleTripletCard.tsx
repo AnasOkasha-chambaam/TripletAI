@@ -89,7 +89,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
       <CardContent className="p-6 flex items-center justify-between">
         <div className="w-full">
           <p
-            className={cn("text-sm text-foreground/40", {
+            className={cn("text-sm text-muted-foreground", {
               truncate: !!lockedBy,
             })}
           >

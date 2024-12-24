@@ -7,25 +7,25 @@ export function Footer() {
         <div className="flex justify-center space-x-6 md:order-2">
           {/* <Link
             href="/privacy"
-            className="text-foreground/40 hover:text-foreground/70"
+            className="text-muted-foreground hover:text-muted-foreground"
           >
             Privacy Policy
           </Link>
           <Link
             href="/terms"
-            className="text-foreground/40 hover:text-foreground/70"
+            className="text-muted-foreground hover:text-muted-foreground"
           >
             Terms of Service
           </Link> */}
           <a
             href="mailto:anasokashachama@gmail.com"
-            className="text-foreground/40 hover:text-foreground/70"
+            className="text-muted-foreground hover:text-muted-foreground"
           >
             Contact
           </a>
         </div>
         <div className="mt-8 md:mt-0 md:order-1">
-          <p className="text-center text-base text-foreground/40">
+          <p className="text-center text-base text-muted-foreground">
             &copy; {new Date().getFullYear()} TripletAI. All rights reserved.
           </p>
         </div>

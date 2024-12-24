@@ -29,7 +29,7 @@ export default function UnauthorizedPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-foreground/40 mb-4">
+          <p className="text-muted-foreground mb-4">
             If you believe this is an error, please contact the administrator or
             try signing in with a different account.
           </p>

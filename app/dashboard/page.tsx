@@ -6,10 +6,10 @@ import { ImportTripletsDialog } from "@/components/ImportTripletsDialog";
 import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getInitialPresence } from "@/lib/actions/presence.actions";
 import { syncTripletsWithLiveblocks } from "@/lib/actions/triplet.actions";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
-import { getInitialPresence } from "@/lib/actions/presence.actions";
 
 export default async function Dashboard() {
   await syncTripletsWithLiveblocks();
@@ -21,7 +21,7 @@ export default async function Dashboard() {
       <div className="min-h-screen overflow-x-hidden">
         <section className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-foreground/80">
+            <h2 className="text-2xl font-semibold text-muted-foreground">
               Triplets
             </h2>
             <div className="space-x-4">

@@ -14,34 +14,12 @@ import Link from "next/link";
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
-      {/* <header className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-blue-800">TripletAI</h1>
-        <div className="flex items-center space-x-4">
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <>
-              <Link href="/dashboard" passHref>
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <Separator
-                orientation="vertical"
-                color="red"
-                className="h-9 max-h-full"
-              />
-              <UserButton />
-            </>
-          </SignedIn>
-        </div>
-      </header> */}
-
       <div className="container mx-auto px-4 py-16">
         <section className="text-center mb-16">
           <h2 className="text-5xl font-extrabold text-primary mb-4">
             Streamline Your AI Training Data
           </h2>
-          <p className="text-xl text-foreground/40 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Efficiently manage and curate your supervised learning triplets with
             our intuitive platform.
           </p>
@@ -102,7 +80,7 @@ export default function LandingPage() {
 
         <section className="bg-card text-card-foreground rounded-lg p-8 mb-16">
           <h3 className="text-3xl font-bold text-primary mb-4">How It Works</h3>
-          <ol className="list-decimal list-inside space-y-4 text-card-foreground/60">
+          <ol className="list-decimal list-inside space-y-4 text-muted-foreground">
             <li>Sign in with your authorized email</li>
             <li>Review pending triplets with our intuitive swipe interface</li>
             <li>Easily edit and manage accepted and rejected triplets</li>
@@ -114,7 +92,7 @@ export default function LandingPage() {
           <h3 className="text-3xl font-bold text-primary mb-4">
             Ready to Optimize Your AI Training Data?
           </h3>
-          <p className="text-xl text-foreground/40 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Join the growing community of AI researchers and developers using
             TripletAI to streamline their workflow.
           </p>
