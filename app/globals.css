@@ -89,3 +89,47 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @media (max-height: 560px) {
+    .rotated-max-md-h-\[45vh\] {
+      @apply h-[45vh];
+    }
+
+    .rotated-max-md-py-3 {
+      @apply py-3;
+    }
+
+    .rotated-max-md-flex {
+      @apply flex;
+    }
+
+    .rotated-max-md-mx-2 {
+      @apply mx-2;
+    }
+
+    .rotated-max-md-size-5 {
+      @apply size-5;
+    }
+
+    .rotated-max-md-hidden {
+      @apply hidden;
+    }
+
+    .rotated-max-md-mx-auto {
+      @apply mx-auto;
+    }
+
+    .rotated-max-md-mt-0 {
+      @apply mt-0;
+    }
+
+    .rotated-max-md-hidden {
+      @apply hidden;
+    }
+
+    .rotated-max-md-bg-muted {
+      @apply bg-muted;
+    }
+  }
+}
