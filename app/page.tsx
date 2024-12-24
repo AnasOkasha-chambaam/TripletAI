@@ -36,6 +36,7 @@ export default function LandingPage() {
             <CardHeader>
               <BarChart className="h-8 w-8 sm:h-10 sm:w-10 text-blue-500 mb-2" />
               <CardTitle>Efficient Management</CardTitle>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
               <p>
@@ -48,6 +49,7 @@ export default function LandingPage() {
             <CardHeader>
               <Layers className="h-8 w-8 sm:h-10 sm:w-10 text-green-500 mb-2" />
               <CardTitle>Smart Categorization</CardTitle>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
               <p>
@@ -60,6 +62,7 @@ export default function LandingPage() {
             <CardHeader>
               <Zap className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-500 mb-2" />
               <CardTitle>Rapid Iteration</CardTitle>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
               <p>
