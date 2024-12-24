@@ -186,17 +186,17 @@ export default function PendingTriplets() {
                 </motion.div>
 
                 {/* Swipe direction icons */}
-                <div className="absolute z-40 md:z-20 size-20 font-bold bg-green-700  border-muted border-4 outline-green-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -right-4 transform md:translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity ">
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-green-700  border-muted border-4 outline-green-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -right-4 transform md:translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity ">
                   <CheckCircle className="size-5" /> Accept
                 </div>
-                <div className="absolute z-40 md:z-20 size-20 font-bold bg-red-700 border-muted border-4 outline-red-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -left-4 transform md:-translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-red-700 border-muted border-4 outline-red-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] top-1/2 -left-4 transform md:-translate-x-full -translate-y-1/2 opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity">
                   <XCircle className="size-5" /> Reject
                 </div>
-                <div className="absolute z-40 md:z-20 size-20 font-bold bg-blue-700 border-muted border-4 outline-blue-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -top-4 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-blue-700 border-muted border-4 outline-blue-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -top-4 left-1/2 transform -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity">
                   <Edit className="size-5" /> Edit
                 </div>
                 {/* TODO: Implement `Skip` functionality */}
-                {/* <div className="absolute z-40 md:z-20 size-20 font-bold bg-yellow-700 border-muted border-4 outline-yellow-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -bottom-4 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-75 pointer-events-none transition-opacity">
+                {/* <div className="absolute z-40 md:z-20 size-20 font-bold bg-yellow-700 border-muted border-4 outline-yellow-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -bottom-4 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity">
                   <ArrowDown className="size-5" /> Skip
                 </div> */}
               </div>

@@ -38,7 +38,7 @@ export function Navbar() {
           className={cn(
             "inline-flex items-center p-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 sm:border-b-2 border-transparent hover:border-muted transition-colors",
             {
-              "text-foreground font-semibold border-border sm:border-b-2 max-sm:bg-muted":
+              "text-foreground font-semibold border-border sm:border-b-2 max-sm:bg-muted rotated-max-md-bg-muted":
                 pathname === item.href,
             }
           )}

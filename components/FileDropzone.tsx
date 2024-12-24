@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FileUpIcon, UploadCloud } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { cn } from "@/lib/utils";
 
 interface FileDropzoneProps {
   onFileAccepted: (file: File) => void;
@@ -37,25 +38,33 @@ export function FileDropzone({ onFileAccepted }: FileDropzoneProps) {
   return (
     <div
       {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer ${
-        isDragActive ? "border-primary bg-primary/10" : "border-gray-300"
-      }`}
+      className={cn(
+        `border-2 border-dashed rounded-lg p-6 rotated-max-md-py-3 text-center cursor-pointer border-muted-foreground rotated-max-md-flex`,
+        {
+          "border-primary bg-primary/10": isDragActive,
+        }
+      )}
     >
       <input {...getInputProps()} name="file" />
-      <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
+      <UploadCloud
+        className={cn(
+          "mx-auto rotated-max-md-mx-2 size-12 rotated-max-md-size-5 text-muted-foreground",
+          { "text-primary/10 rotated-max-md-hidden": !!fileName }
+        )}
+      />
       {fileName ? (
         <Badge
-          className="mt-2 p-1 scale-125 rounded-sm opacity-60"
+          className="mt-2 p-1 scale-125 rounded-sm opacity-60 rotated-max-md-mx-auto rotated-max-md-mt-0"
           variant={"outline"}
         >
           <FileUpIcon className="size-3 mr-1" /> {fileName}
         </Badge>
       ) : (
         <>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-muted-foreground rotated-max-md-hidden">
             Drag and drop a JSON or CSV file here, or click to select a file
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground/60">
             (Only .json and .csv files will be accepted)
           </p>
         </>

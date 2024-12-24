@@ -76,8 +76,8 @@ export function ImportTripletsDialog({
         <DialogHeader>
           <DialogTitle>Import Triplets</DialogTitle>
           <DialogDescription>
-            Import triplets from a JSON or CSV file. Imported triplets will be
-            set to pending status.
+            Imported triplets will be set to
+            <span className="font-bold"> pending status</span>.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>

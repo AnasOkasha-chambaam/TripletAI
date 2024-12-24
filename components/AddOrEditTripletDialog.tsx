@@ -20,6 +20,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { addTriplet, editTriplet } from "@/lib/actions/triplet.actions";
 import { toast } from "sonner";
 import { PlusIcon, EditIcon } from "lucide-react";
+import { Separator } from "./ui/separator";
+import { ScrollArea } from "./ui/scroll-area";
 
 export function AddOrEditTripletDialog({
   triplet,
@@ -131,41 +133,44 @@ export function AddOrEditTripletDialog({
             }
           }}
         >
-          <div className="grid gap-4 py-4">
-            <div className="flex flex-col gap-4">
-              <Label htmlFor="instruction">Instruction</Label>
-              <Input
-                id="instruction"
-                name="instruction"
-                defaultValue={triplet?.instruction}
-                className="col-span-3"
-                required
-                disabled={isPending}
-              />
+          <ScrollArea className="rotated-max-md-h-[45vh]">
+            <div className="grid gap-4 py-4 px-2">
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="instruction">Instruction</Label>
+                <Input
+                  id="instruction"
+                  name="instruction"
+                  defaultValue={triplet?.instruction}
+                  className="col-span-3"
+                  required
+                  disabled={isPending}
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="input">Input</Label>
+                <Input
+                  id="input"
+                  name="input"
+                  defaultValue={triplet?.input}
+                  className="col-span-3"
+                  required
+                  disabled={isPending}
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="output">Output</Label>
+                <Textarea
+                  id="output"
+                  name="output"
+                  defaultValue={triplet?.output}
+                  className="col-span-3"
+                  required
+                  disabled={isPending}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-4">
-              <Label htmlFor="input">Input</Label>
-              <Input
-                id="input"
-                name="input"
-                defaultValue={triplet?.input}
-                className="col-span-3"
-                required
-                disabled={isPending}
-              />
-            </div>
-            <div className="flex flex-col gap-4">
-              <Label htmlFor="output">Output</Label>
-              <Textarea
-                id="output"
-                name="output"
-                defaultValue={triplet?.output}
-                className="col-span-3"
-                required
-                disabled={isPending}
-              />
-            </div>
-          </div>
+          </ScrollArea>
+          <Separator className="my-2" />
           <DialogFooter>
             <Button type="submit" disabled={isPending}>
               {isPending
