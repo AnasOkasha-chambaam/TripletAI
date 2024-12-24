@@ -24,24 +24,6 @@ export default function RejectedTriplets() {
     setEditingTriplet(triplet);
   };
 
-  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const updatedTriplet = {
-      input: formData.get("input") as string,
-      output: formData.get("output") as string,
-      instruction: formData.get("instruction") as string,
-      status: "accepted",
-    };
-    await fetch(`/api/triplets/${editingTriplet?._id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTriplet),
-    });
-    setEditingTriplet(null);
-    fetchRejectedTriplets();
-  };
-
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
