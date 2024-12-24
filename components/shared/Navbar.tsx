@@ -10,6 +10,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "../ui/theme-toggle";
 import Logo from "./Logo";
+import { MenuIcon } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -70,11 +71,10 @@ export function Navbar() {
               </div>
             </SignedOut>
           </div>
-          <div className="flex items-center sm:hidden">
+          <div className="flex items-center gap-2 sm:hidden">
             {/* TODO: Create a side sheet for the menu. */}
-            <Button variant="ghost" size="sm">
-              Menu
-            </Button>
+            <ThemeToggle />
+            <Separator orientation="vertical" className="h-9 max-h-full" />
           </div>
         </div>
       </div>

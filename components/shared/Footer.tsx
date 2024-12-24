@@ -19,7 +19,7 @@ export function Footer() {
           </Link> */}
           <a
             href="mailto:anasokashachama@gmail.com"
-            className="text-muted-foreground hover:text-muted-foreground"
+            className="text-muted-foreground hover:text-muted-foreground hover:underline underline-offset-2"
           >
             Contact
           </a>
