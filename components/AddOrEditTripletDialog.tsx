@@ -27,10 +27,12 @@ export function AddOrEditTripletDialog({
   triplet,
   openExternal = false,
   setOpenExternal,
+  successCallback,
 }: {
   triplet?: TTriplet;
   openExternal?: boolean;
   setOpenExternal?: React.Dispatch<React.SetStateAction<boolean>>;
+  successCallback?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [addTripletState, addTripletAction, isAddTripletPending] =

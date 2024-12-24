@@ -18,6 +18,10 @@ import { Separator } from "./ui/separator";
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
 
+  const [statusToApply, setStatusToApply] = useState<
+    "accepted" | "rejected" | null
+  >(null);
+
   const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
 
   const updateMyPresence = useUpdateMyPresence();
@@ -71,7 +75,13 @@ export default function PendingTriplets() {
 
   useEffect(() => {
     if (updateState?.success) {
-      toast.success("Triplet status updated successfully");
+      if (statusToApply === "accepted") {
+        toast.success("Triplet accepted successfully");
+      }
+      if (statusToApply === "rejected") {
+        toast.info("Triplet was rejected");
+      }
+      setStatusToApply(null);
     }
   }, [updateState]);
 
@@ -81,9 +91,11 @@ export default function PendingTriplets() {
     let newStatus = "";
     switch (direction) {
       case "right":
+        setStatusToApply("accepted");
         newStatus = "accepted";
         break;
       case "left":
+        setStatusToApply("rejected");
         newStatus = "rejected";
         break;
       case "up":
@@ -181,7 +193,8 @@ export default function PendingTriplets() {
                 >
                   <SingleTripletCard
                     triplet={currentTriplet}
-                    isActionPending={isUpdateActionPending}
+                    isActionPending={isEditDisabled}
+                    statusToApply={statusToApply}
                   />
                 </motion.div>
 
@@ -204,6 +217,11 @@ export default function PendingTriplets() {
                 triplet={currentTriplet}
                 openExternal={isEditModalOpen}
                 setOpenExternal={setIsEditModalOpen}
+                successCallback={() => {
+                  toast.success(
+                    "Triplet edited and added to the accepted list"
+                  );
+                }}
               />
             </div>
           ) : (

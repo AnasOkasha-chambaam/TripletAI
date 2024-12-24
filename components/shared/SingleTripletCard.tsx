@@ -21,6 +21,7 @@ interface TripletCardProps {
   isSelected?: boolean;
   onSelect?: () => void;
   onEdit?: () => void;
+  statusToApply?: "accepted" | "rejected" | null;
 }
 
 const SingleTripletCard: React.FC<TripletCardProps> = ({
@@ -30,6 +31,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
   isSelected,
   onSelect,
   onEdit,
+  statusToApply,
 }) => {
   const tripletType = triplet.status;
 
@@ -41,10 +43,21 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     >
       <div className="flex flex-row items-center justify-between">
         <CardHeader>
-          <CardTitle className="text-primary flex flex-row items-center">
+          <CardTitle
+            className={cn("text-primary flex flex-row items-center", {
+              "text-green-600": isActionPending && statusToApply === "accepted",
+              "text-destructive":
+                isActionPending && statusToApply === "rejected",
+            })}
+          >
             {isActionPending ? (
               <>
-                <Loader2Icon className="animate-spin mr-2" /> Applying Action...
+                <Loader2Icon className="animate-spin mr-2" />{" "}
+                {statusToApply === "accepted"
+                  ? "Accepting Triplet"
+                  : statusToApply === "rejected"
+                  ? "Rejecting Triplet"
+                  : "Loading"}
               </>
             ) : !!lockedBy ? (
               <>
