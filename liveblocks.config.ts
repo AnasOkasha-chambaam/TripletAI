@@ -5,25 +5,53 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 declare global {
   interface Liveblocks {
     // Each user's Presence, for useMyPresence, useOthers, etc.
-    Presence: TLiveblocks["Presence"];
+    Presence: {
+      // Example, real-time cursor coordinates
+      // cursor: { x: number; y: number };
+      user: TLockedBy | null;
+      lockedTriplet: TTriplet | null;
+      skippedTripletIds: string[];
+
+      // TODO: Add releaseRequest here
+      // releaseRequest: { tripletId: string; requestedAt: number } | null;
+    };
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
-    Storage: TLiveblocks["Storage"];
+    Storage: {
+      // Example, a conflict-free list
+      // animals: LiveList<string>;
+      triplets: LiveList<TTriplet>;
+    };
 
     // Custom user info set when authenticating with a secret key
-    UserMeta: TLiveblocks["UserMeta"];
+    UserMeta: {
+      id: string;
+      info: {
+        // Example properties, for useSelf, useUser, useOthers, etc.
+        // name: string;
+        // avatar: string;
+      };
+    };
 
     // Custom events, for useBroadcastEvent, useEventListener
-    RoomEvent: TLiveblocks["RoomEvent"];
+    RoomEvent: {};
     // Example has two events, using a union
     // | { type: "PLAY" }
     // | { type: "REACTION"; emoji: "🔥" };
 
     // Custom metadata set on threads, for useThreads, useCreateThread, etc.
-    ThreadMetadata: TLiveblocks["ThreadMetadata"];
+    ThreadMetadata: {
+      // Example, attaching coordinates to a thread
+      // x: number;
+      // y: number;
+    };
 
     // Custom room info set with resolveRoomsInfo, for useRoomInfo
-    RoomInfo: TLiveblocks["RoomInfo"];
+    RoomInfo: {
+      // Example, rooms with a title and url
+      // title: string;
+      // url: string;
+    };
   }
 }
 

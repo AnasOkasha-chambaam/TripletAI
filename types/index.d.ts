@@ -77,40 +77,4 @@ declare type TUser = TMongoDBItem & {
 };
 
 /* Liveblocks */
-declare type TLiveblocks = {
-  Presence: {
-    // Example, real-time cursor coordinates
-    // cursor: { x: number; y: number };
-    user: TLockedBy | null;
-    lockedTriplet: TTriplet | null;
-    skippedTripletIds: string[];
-  };
-
-  Storage: {
-    // Example, a conflict-free list
-    // animals: LiveList<string>;
-    triplets: LiveList<TTriplet>;
-  };
-
-  UserMeta: {
-    id: string;
-    info: {
-      // Example properties, for useSelf, useUser, useOthers, etc.
-      // name: string;
-      // avatar: string;
-    };
-  };
-  RoomEvent: {};
-
-  ThreadMetadata: {
-    // Example, attaching coordinates to a thread
-    // x: number;
-    // y: number;
-  };
-
-  RoomInfo: {
-    // Example, rooms with a title and url
-    // title: string;
-    // url: string;
-  };
-};
+declare type TLiveblocks = Liveblocks;
