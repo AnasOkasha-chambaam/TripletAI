@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { shallow, useUpdateMyPresence } from "@liveblocks/react";
 import { useOthersMapped } from "@liveblocks/react/suspense";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
+import { ArrowDown, CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
@@ -14,9 +14,14 @@ import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
+import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
+
+  const { skipTriplet, isSkippedTriplet, clearSkippedTriplets } =
+    useSkippedTriplets();
 
   const [statusToApply, setStatusToApply] = useState<
     "accepted" | "rejected" | null
@@ -56,7 +61,9 @@ export default function PendingTriplets() {
   const pendingTriplets = triplets.filter((t) => t.status === "pending");
 
   const availableTriplets = pendingTriplets.filter(
-    (t) => !lockedTriplets.find((lt) => lt.triplet._id === t._id)
+    (t) =>
+      !lockedTriplets.find((lt) => lt.triplet._id === t._id) &&
+      !isSkippedTriplet(t)
   );
 
   useEffect(() => {
@@ -103,7 +110,9 @@ export default function PendingTriplets() {
         return;
       case "down":
         // Move to bottom of the list
+        skipTriplet(currentTriplet._id);
 
+        toast.info("Triplet skipped");
         return;
     }
 
@@ -209,9 +218,9 @@ export default function PendingTriplets() {
                   <Edit className="size-5" /> Edit
                 </div>
                 {/* TODO: Implement `Skip` functionality */}
-                {/* <div className="absolute z-40 md:z-20 size-20 font-bold bg-yellow-700 border-muted border-4 outline-yellow-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -bottom-4 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity">
+                <div className="absolute z-40 md:z-20 size-20 font-bold bg-yellow-700 border-muted border-4 outline-yellow-700 outline flex flex-col justify-center items-center gap-2 text-muted text-sm rounded-[50%] -bottom-4 left-1/2 transform -translate-x-1/2 translate-y-full opacity-0 group-hover:opacity-75 group-active:opacity-90 pointer-events-none transition-opacity">
                   <ArrowDown className="size-5" /> Skip
-                </div> */}
+                </div>
               </div>
               <AddOrEditTripletDialog
                 triplet={currentTriplet}
@@ -236,6 +245,7 @@ export default function PendingTriplets() {
           )}
         </div>
       </div>
+      <ClearSkippedTripletsModal />
     </>
   );
 }

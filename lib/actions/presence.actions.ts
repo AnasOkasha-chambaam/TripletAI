@@ -6,6 +6,7 @@ import { getLoggedInUser } from "./user.actions";
 export async function getInitialPresence(): Promise<{
   user: TLockedBy | null;
   lockedTriplet: TTriplet | null;
+  skippedTripletIds: string[];
 }> {
   const { user: loggedInUser } = await getLoggedInUser();
 
@@ -13,6 +14,7 @@ export async function getInitialPresence(): Promise<{
     return {
       user: null,
       lockedTriplet: null,
+      skippedTripletIds: [],
     };
   }
 
@@ -23,5 +25,6 @@ export async function getInitialPresence(): Promise<{
       picture: loggedInUser.picture,
     },
     lockedTriplet: null,
+    skippedTripletIds: [],
   };
 }

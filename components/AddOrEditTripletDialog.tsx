@@ -69,9 +69,13 @@ export function AddOrEditTripletDialog({
         setOpen(false);
         setOpenExternal?.(false);
 
-        toast.success(`Triplet edited successfully`, {
-          description: `The triplet has been edited successfully.`,
-        });
+        if (successCallback) {
+          successCallback();
+        } else {
+          toast.success(`Triplet edited successfully`, {
+            description: `The triplet has been edited successfully.`,
+          });
+        }
       } else {
         toast.error(`Error editing triplet`, {
           description:

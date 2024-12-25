@@ -78,6 +78,12 @@ declare type TUser = TMongoDBItem & {
 
 /* Liveblocks */
 declare type TLiveblocksPresence = {
+  // Example, real-time cursor coordinates
+  // cursor: { x: number; y: number };
   user: TLockedBy | null;
   lockedTriplet: TTriplet | null;
+  skippedTripletIds: string[];
+
+  // TODO: Add releaseRequest here
+  // releaseRequest: { tripletId: string; requestedAt: number } | null;
 };

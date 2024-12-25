@@ -5,12 +5,7 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 declare global {
   interface Liveblocks {
     // Each user's Presence, for useMyPresence, useOthers, etc.
-    Presence: {
-      // Example, real-time cursor coordinates
-      // cursor: { x: number; y: number };
-      user: TLockedBy | null;
-      lockedTriplet: TTriplet | null;
-    };
+    Presence: TLiveblocksPresence;
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
     Storage: {
