@@ -2,6 +2,7 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 
 // Define Liveblocks types for your application
 // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data
+
 declare global {
   interface Liveblocks {
     // Each user's Presence, for useMyPresence, useOthers, etc.
@@ -11,9 +12,6 @@ declare global {
       user: TLockedBy | null;
       lockedTriplet: TTriplet | null;
       skippedTripletIds: string[];
-
-      // TODO: Add releaseRequest here
-      // releaseRequest: { tripletId: string; requestedAt: number } | null;
     };
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
@@ -21,6 +19,12 @@ declare global {
       // Example, a conflict-free list
       // animals: LiveList<string>;
       triplets: LiveList<TTriplet>;
+      releaseRequests: LiveObject<{
+        [tripletId: string]: LiveObject<{
+          requestedBy: TLockedBy;
+          message: string;
+        }>;
+      }>;
     };
 
     // Custom user info set when authenticating with a secret key
