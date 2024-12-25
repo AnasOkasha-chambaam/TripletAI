@@ -17,7 +17,7 @@ export function Room({
 }: {
   children: ReactNode;
   initialTriplets: TTriplet[];
-  initialPresence: TLiveblocksPresence;
+  initialPresence: TLiveblocks["Presence"];
 }) {
   const publicApiKey = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY;
 

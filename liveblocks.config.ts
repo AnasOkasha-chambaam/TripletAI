@@ -5,44 +5,25 @@ import { LiveList, LiveObject } from "@liveblocks/client";
 declare global {
   interface Liveblocks {
     // Each user's Presence, for useMyPresence, useOthers, etc.
-    Presence: TLiveblocksPresence;
+    Presence: TLiveblocks["Presence"];
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
-    Storage: {
-      // Example, a conflict-free list
-      // animals: LiveList<string>;
-      triplets: LiveList<TTriplet>;
-    };
+    Storage: TLiveblocks["Storage"];
 
     // Custom user info set when authenticating with a secret key
-    UserMeta: {
-      id: string;
-      info: {
-        // Example properties, for useSelf, useUser, useOthers, etc.
-        // name: string;
-        // avatar: string;
-      };
-    };
+    UserMeta: TLiveblocks["UserMeta"];
 
     // Custom events, for useBroadcastEvent, useEventListener
-    RoomEvent: {};
+    RoomEvent: TLiveblocks["RoomEvent"];
     // Example has two events, using a union
     // | { type: "PLAY" }
     // | { type: "REACTION"; emoji: "🔥" };
 
     // Custom metadata set on threads, for useThreads, useCreateThread, etc.
-    ThreadMetadata: {
-      // Example, attaching coordinates to a thread
-      // x: number;
-      // y: number;
-    };
+    ThreadMetadata: TLiveblocks["ThreadMetadata"];
 
     // Custom room info set with resolveRoomsInfo, for useRoomInfo
-    RoomInfo: {
-      // Example, rooms with a title and url
-      // title: string;
-      // url: string;
-    };
+    RoomInfo: TLiveblocks["RoomInfo"];
   }
 }
 
