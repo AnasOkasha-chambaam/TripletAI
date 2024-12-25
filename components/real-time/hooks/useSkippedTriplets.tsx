@@ -1,5 +1,4 @@
 import { useMyPresence } from "@liveblocks/react";
-import React from "react";
 
 const useSkippedTriplets = () => {
   const [myPresence, updateMyPresence] = useMyPresence();

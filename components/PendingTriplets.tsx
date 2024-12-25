@@ -20,8 +20,7 @@ import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
 
-  const { skipTriplet, isSkippedTriplet, clearSkippedTriplets } =
-    useSkippedTriplets();
+  const { skipTriplet, isSkippedTriplet } = useSkippedTriplets();
 
   const [statusToApply, setStatusToApply] = useState<
     "accepted" | "rejected" | null
