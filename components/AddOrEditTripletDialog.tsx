@@ -61,7 +61,7 @@ export function AddOrEditTripletDialog({
         });
       }
     }
-  }, [addTripletState, setOpenExternal, successCallback]);
+  }, [addTripletState, setOpenExternal]);
 
   useEffect(() => {
     if (editTripletState) {
@@ -84,7 +84,7 @@ export function AddOrEditTripletDialog({
         });
       }
     }
-  }, [editTripletState, setOpenExternal, successCallback]);
+  }, [editTripletState, setOpenExternal]);
 
   const isPending = triplet ? isEditTripletPending : isAddTripletPending;
 

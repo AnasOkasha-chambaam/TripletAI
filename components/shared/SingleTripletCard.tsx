@@ -11,8 +11,14 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { EditIcon, Loader2Icon, LockKeyholeIcon } from "lucide-react";
+import {
+  EditIcon,
+  Loader2Icon,
+  LockKeyholeIcon,
+  LockOpenIcon,
+} from "lucide-react";
 import React from "react";
+import { useReleaseTriplet } from "../real-time/hooks/useReleaseTriplet";
 
 interface TripletCardProps {
   triplet: TTriplet;
@@ -35,10 +41,13 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
 }) => {
   const tripletType = triplet.status;
 
+  const { requestRelease } = useReleaseTriplet(null);
+
   return (
     <Card
-      className={cn("max-w-md mx-auto w-80 md:w-full", {
+      className={cn("max-w-md mx-auto w-80 md:w-full md:min-w-80", {
         "opacity-65": isActionPending || !!lockedBy,
+        "max-sm:w-60": !!lockedBy,
       })}
     >
       <div className="flex flex-row items-center justify-between">
@@ -81,7 +90,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
               : "Swipe to take an action"}
           </CardDescription>
         </CardHeader>
-        {(onSelect || onEdit) && (
+        {(onSelect || onEdit || lockedBy) && (
           <Separator orientation="vertical" className="h-14" />
         )}
         {onSelect && (
@@ -95,6 +104,21 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
         {onEdit && (
           <Button onClick={onEdit} className="mx-4">
             <EditIcon /> Edit
+          </Button>
+        )}
+        {!!lockedBy && (
+          <Button
+            variant={"outline"}
+            onClick={() =>
+              requestRelease(
+                triplet._id,
+                "Please, pass this triplet for me to view it."
+              )
+            }
+            className="mx-4"
+          >
+            <LockOpenIcon className="sm:mr-2" />{" "}
+            <span className="hidden sm:inline">Request</span>
           </Button>
         )}
       </div>

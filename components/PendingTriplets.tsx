@@ -9,13 +9,14 @@ import { ArrowDown, CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
+import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
 import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
+import { useReleaseTriplet } from "./real-time/hooks/useReleaseTriplet";
+import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
-import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
-import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 
 export default function PendingTriplets() {
   const { triplets } = useRealtimeTriplets();
@@ -54,16 +55,22 @@ export default function PendingTriplets() {
   );
 
   const lockedTriplets = Array.from(lockedTripletsMapped)
-    .filter((lt) => lt[1].triplet)
-    .map((lt) => lt[1]) as TLockedTriplet[];
+    .filter((lt) => lt[1].triplet, shallow)
+    .map((lt) => lt[1], shallow) as TLockedTriplet[];
 
-  const pendingTriplets = triplets.filter((t) => t.status === "pending");
+  const pendingTriplets = triplets.filter(
+    (t) => t.status === "pending",
+    shallow
+  );
 
   const availableTriplets = pendingTriplets.filter(
     (t) =>
       !lockedTriplets.find((lt) => lt.triplet._id === t._id) &&
-      !isSkippedTriplet(t)
+      !isSkippedTriplet(t),
+    shallow
   );
+
+  useReleaseTriplet(currentTriplet);
 
   useEffect(() => {
     updateMyPresence({

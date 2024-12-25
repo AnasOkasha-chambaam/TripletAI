@@ -6,7 +6,7 @@ import { ImportTripletsDialog } from "@/components/ImportTripletsDialog";
 import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getInitialPresence } from "@/lib/actions/presence.actions";
+import { getInitialPresence } from "@/lib/actions/liveblocks.actions";
 import { syncTripletsWithLiveblocks } from "@/lib/actions/triplet.actions";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
@@ -17,8 +17,8 @@ export default async function Dashboard() {
   const initialPresence = await getInitialPresence();
 
   return (
-    <Room initialTriplets={[]} initialPresence={initialPresence}>
-      <div className="min-h-screen overflow-x-hidden">
+    <Room initialPresence={initialPresence}>
+      <div className="min-h-screen overflow-hidden pb-28">
         <section className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-muted-foreground">

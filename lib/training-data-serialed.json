@@ -1,0 +1,47 @@
+[
+  {
+    "input": "111",
+    "instruction": "111",
+    "output": "111"
+  },
+  {
+    "input": "222",
+    "instruction": "222",
+    "output": "222"
+  },
+  {
+    "input": "333",
+    "instruction": "333",
+    "output": "333"
+  },
+  {
+    "input": "444",
+    "instruction": "444",
+    "output": "444"
+  },
+  {
+    "input": "555",
+    "instruction": "555",
+    "output": "555"
+  },
+  {
+    "input": "666",
+    "instruction": "666",
+    "output": "666"
+  },
+  {
+    "input": "777",
+    "instruction": "777",
+    "output": "777"
+  },
+  {
+    "input": "888",
+    "instruction": "888",
+    "output": "888"
+  },
+  {
+    "input": "999",
+    "instruction": "999",
+    "output": "999"
+  }
+]

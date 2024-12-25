@@ -2,7 +2,7 @@
 
 "use client";
 
-import { LiveList } from "@liveblocks/client";
+import { LiveList, LiveObject } from "@liveblocks/client";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
@@ -12,11 +12,9 @@ import { ReactNode } from "react";
 
 export function Room({
   children,
-  initialTriplets,
   initialPresence,
 }: {
   children: ReactNode;
-  initialTriplets: TTriplet[];
   initialPresence: TLiveblocks["Presence"];
 }) {
   const publicApiKey = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY;
@@ -29,7 +27,8 @@ export function Room({
     <LiveblocksProvider publicApiKey={publicApiKey}>
       <RoomProvider
         initialStorage={{
-          triplets: new LiveList(initialTriplets),
+          triplets: new LiveList([]),
+          releaseRequests: new LiveObject({}),
         }}
         initialPresence={initialPresence}
         id="triplet-ai"

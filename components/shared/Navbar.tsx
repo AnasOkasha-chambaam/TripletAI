@@ -66,9 +66,8 @@ export function Navbar() {
             <UserButton />
           </SignedIn>
           <SignedOut>
-            <NavLinks />
-            <Separator orientation="vertical" className="h-6" />
             <ThemeToggle />
+            <Separator orientation="vertical" className="h-6" />
             <SignInButton mode="modal">
               <Button variant="outline">Sign In</Button>
             </SignInButton>
@@ -80,44 +79,54 @@ export function Navbar() {
             <UserButton />
           </SignedIn>
           <Separator orientation="vertical" className="h-9" />
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MenuIcon className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="flex flex-col justify-between"
-            >
-              <div className="">
-                <Link href="/" className="rounded-full p-4 w-fit flex mx-auto">
-                  <Logo className="size-10" fill="hsl(var(--primary))" />
-                </Link>
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>
-                    Navigate through TripletAI
-                  </SheetDescription>
-                </SheetHeader>
-                <Separator className="mb-9 mt-1" />
-                <div className="flex flex-col justify-between space-y-4">
-                  <NavLinks />
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button variant="outline">Sign In</Button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MenuIcon className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="flex flex-col justify-between"
+              >
+                <div className="">
+                  <Link
+                    href="/"
+                    className="rounded-full p-4 w-fit flex mx-auto"
+                  >
+                    <Logo className="size-10" fill="hsl(var(--primary))" />
+                  </Link>
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                    <SheetDescription>
+                      Navigate through TripletAI
+                    </SheetDescription>
+                  </SheetHeader>
+                  <Separator className="mb-9 mt-1" />
+                  <div className="flex flex-col justify-between space-y-4">
+                    <NavLinks />
+                  </div>
                 </div>
-              </div>
-              <SignedOut>
-                <SheetFooter className="flex flex-col gap-2">
-                  <>
-                    <Separator />
-                    <SignInButton>
-                      <Button className="w-full">Sign In</Button>
-                    </SignInButton>
-                  </>
-                </SheetFooter>
-              </SignedOut>
-            </SheetContent>
-          </Sheet>
+                <SignedOut>
+                  <SheetFooter className="flex flex-col gap-2">
+                    <>
+                      <Separator />
+                      <SignInButton>
+                        <Button className="w-full">Sign In</Button>
+                      </SignInButton>
+                    </>
+                  </SheetFooter>
+                </SignedOut>
+              </SheetContent>
+            </Sheet>
+          </SignedIn>
         </div>
       </div>
     </nav>

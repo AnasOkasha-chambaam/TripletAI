@@ -3,10 +3,10 @@
 
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
-import { createClient, LiveList } from "@liveblocks/client";
+import { createClient, LiveList, LiveObject } from "@liveblocks/client";
 import { parse } from "csv-parse/sync";
 import { JSONify } from "../utils";
-import { getInitialPresence } from "./presence.actions";
+import { getInitialPresence } from "./liveblocks.actions";
 
 const client = createClient({
   publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
@@ -166,6 +166,7 @@ export async function syncTripletsWithLiveblocks() {
       {
         initialStorage: {
           triplets: new LiveList([]),
+          releaseRequests: new LiveObject({}),
         },
         initialPresence,
       }

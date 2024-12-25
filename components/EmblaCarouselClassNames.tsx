@@ -45,6 +45,7 @@ export default function EmblaCarouselClassNames({
     setSelectedIndex(emblaApi.selectedScrollSnap());
     setPrevBtnDisabled(!emblaApi.canScrollPrev());
     setNextBtnDisabled(!emblaApi.canScrollNext());
+    setScrollSnaps(emblaApi.scrollSnapList());
   }, [emblaApi]);
 
   useEffect(() => {
@@ -56,9 +57,9 @@ export default function EmblaCarouselClassNames({
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="max-w-3xl w-80 md:w-96 mx-auto my-3">
+    <div className="max-w-3xl w-80 sm:w-96 mx-auto my-3">
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex -ml-4 touch-pan-y">
+        <div className="flex -ml-1 touch-pan-y">
           {slides.length === 0 && (
             <div className="flex-[0_0_70%] min-w-0 pl-4 transition-opacity duration-200 ease-in-out">
               <Image
@@ -73,7 +74,7 @@ export default function EmblaCarouselClassNames({
           {slides.map((slide, index) => (
             <div
               className={cn(
-                "relative flex-[0_0_70%] min-w-0 pl-4 transition-opacity duration-200 ease-in-out opacity-35",
+                "relative flex-[0_0_95%] sm:flex-[0_0_85%] min-w-0 pl-1 transition-opacity duration-200 ease-in-out opacity-35",
                 {
                   "opacity-100": selectedIndex === index,
                 }
