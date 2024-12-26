@@ -2,6 +2,8 @@
 
 "use client";
 
+import { EnhancedVibrantLoader } from "@/components/shared/VibrantLoader";
+import { Badge } from "@/components/ui/badge";
 import { LiveObject } from "@liveblocks/client";
 import {
   ClientSideSuspense,
@@ -29,11 +31,12 @@ export function Room({
         initialStorage={{
           lockedTriplets: new LiveObject({}),
           releaseRequests: new LiveObject({}),
+          skippedTriplets: new LiveObject({}),
         }}
         initialPresence={initialPresence}
         id="triplet-ai-room"
       >
-        <ClientSideSuspense fallback={<div>Loading Triplets…</div>}>
+        <ClientSideSuspense fallback={<EnhancedVibrantLoader />}>
           {children}
         </ClientSideSuspense>
       </RoomProvider>
