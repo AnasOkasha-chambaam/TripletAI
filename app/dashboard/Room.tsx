@@ -2,7 +2,7 @@
 
 "use client";
 
-import { LiveList, LiveObject } from "@liveblocks/client";
+import { LiveObject } from "@liveblocks/client";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
@@ -27,11 +27,12 @@ export function Room({
     <LiveblocksProvider publicApiKey={publicApiKey}>
       <RoomProvider
         initialStorage={{
-          triplets: new LiveList([]),
+          lockedTriplets: new LiveObject({}),
           releaseRequests: new LiveObject({}),
+          pendingTripletsCount: 0,
         }}
         initialPresence={initialPresence}
-        id="triplet-ai"
+        id="triplet-ai-room"
       >
         <ClientSideSuspense fallback={<div>Loading Triplets…</div>}>
           {children}
