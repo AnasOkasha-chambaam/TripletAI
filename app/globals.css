@@ -132,4 +132,8 @@ body {
       @apply bg-muted;
     }
   }
+
+  [data-sonner-toast] [data-close-button] {
+    @apply text-black;
+  }
 }
