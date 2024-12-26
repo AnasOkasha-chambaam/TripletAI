@@ -21,6 +21,7 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
     ({ storage, self }, tripletId: string, message: string) => {
       toast.info("Test: " + tripletId, {
         description: message,
+        richColors: false,
       });
       const { presence } = self;
       if (!presence.user) {
@@ -33,7 +34,9 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
         .get(tripletId);
 
       if (hasARequestAlready) {
-        toast.info("This triplet already have been requested to release.");
+        toast.info("This triplet already have been requested to release.", {
+          richColors: false,
+        });
         return;
       }
 
@@ -89,7 +92,9 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
 
       storage.get("releaseRequests").delete(currentTriplet._id);
 
-      toast.info("Release request dismissed");
+      toast.info("Release request dismissed", {
+        richColors: false,
+      });
     },
     [currentTriplet]
   );
@@ -106,6 +111,7 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
     const timeout = setTimeout(() => {
       toast.info("Release request has expired", {
         description: "Triplet has been skipped due to inactivity",
+        richColors: false,
       });
       acceptReleaseRequest();
     }, RELEASE_TIMEOUT);
