@@ -10,7 +10,6 @@ declare global {
       // Example, real-time cursor coordinates
       // cursor: { x: number; y: number };
       user: TLockedBy | null;
-      lockedTriplet: TTriplet | null;
       skippedTripletIds: string[];
     };
 
@@ -18,13 +17,16 @@ declare global {
     Storage: {
       // Example, a conflict-free list
       // animals: LiveList<string>;
-      triplets: LiveList<TTriplet>;
+      lockedTriplets: LiveObject<{
+        [tripletId: string]: LiveObject<TLockedTriplet>;
+      }>;
       releaseRequests: LiveObject<{
         [tripletId: string]: LiveObject<{
           requestedBy: TLockedBy;
           message: string;
         }>;
       }>;
+      pendingTripletsCount: number;
     };
 
     // Custom user info set when authenticating with a secret key
