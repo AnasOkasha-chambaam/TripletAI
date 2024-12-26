@@ -3,7 +3,6 @@
 "use client";
 
 import { EnhancedVibrantLoader } from "@/components/shared/VibrantLoader";
-import { Badge } from "@/components/ui/badge";
 import { LiveObject } from "@liveblocks/client";
 import {
   ClientSideSuspense,

@@ -20,7 +20,7 @@ export const EnhancedVibrantLoader: React.FC<IEnhancedVibrantLoaderProps> = ({
       setProgress((prevProgress) => {
         if (prevProgress >= 85) {
           clearInterval(interval);
-          onComplete && onComplete();
+          onComplete?.();
           return 100;
         }
         return prevProgress + 10;
