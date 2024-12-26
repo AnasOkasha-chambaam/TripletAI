@@ -7,7 +7,6 @@ export async function getInitialPresence(): Promise<TLiveblocks["Presence"]> {
   if (!loggedInUser) {
     return {
       user: null,
-      lockedTriplet: null,
       skippedTripletIds: [],
     };
   }
@@ -18,7 +17,6 @@ export async function getInitialPresence(): Promise<TLiveblocks["Presence"]> {
       username: loggedInUser.username,
       picture: loggedInUser.picture,
     },
-    lockedTriplet: null,
     skippedTripletIds: [],
   };
 }
