@@ -7,6 +7,7 @@ import { createClient, LiveList, LiveObject } from "@liveblocks/client";
 import { parse } from "csv-parse/sync";
 import { JSONify } from "../utils";
 import { getInitialPresence } from "./liveblocks.actions";
+import { ObjectIdZodSchema } from "../schemas/helpers.zod";
 
 const client = createClient({
   publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
@@ -36,7 +37,7 @@ export async function addTriplet(
   await newTriplet.save();
 
   // Update Liveblocks
-  await syncTripletsWithLiveblocks();
+  // await syncTripletsWithLiveblocks();
 
   return { success: true, triplet: JSONify<TTriplet>(newTriplet) };
 }
@@ -76,7 +77,7 @@ export async function importTriplets(
     const importedTriplets = await Triplet.insertMany(tripletsData);
 
     // Update Liveblocks after import
-    await syncTripletsWithLiveblocks();
+    // await syncTripletsWithLiveblocks();
 
     return { success: true, count: importedTriplets.length };
   } catch (error) {
@@ -104,7 +105,7 @@ export async function updateTripletStatus(
     );
 
     // Update Liveblocks
-    await syncTripletsWithLiveblocks();
+    // await syncTripletsWithLiveblocks();
 
     return { success: true, tripletId: JSONify<string>(updatedTriplet._id) };
   } catch (error) {
@@ -136,7 +137,7 @@ export async function editTriplet(
     );
 
     // Update Liveblocks
-    await syncTripletsWithLiveblocks();
+    // await syncTripletsWithLiveblocks();
 
     return { success: true, triplet: JSONify<TTriplet>(updatedTriplet) };
   } catch (error) {
@@ -151,10 +152,62 @@ export async function fetchTriplets(): Promise<TTriplet[]> {
   return JSONify<TTriplet[]>(triplets);
 }
 
-export async function syncTripletsWithLiveblocks() {
+export async function getNextTripletToLock(
+  prevState: {
+    nextTriplet: TTriplet | undefined;
+    pendingTripletsCount: number;
+  },
+  tripletIdsToSkip: string[]
+) {
+  const validatedIds = tripletIdsToSkip.filter(
+    (id) => ObjectIdZodSchema.safeParse(id).success
+  );
+
+  await dbConnect();
+  const triplet = await Triplet.findOne({
+    _id: { $nin: validatedIds },
+    status: "pending",
+  }).sort({
+    createdAt: 1,
+  });
+
+  const pendingTripletsCount = await Triplet.countDocuments({
+    status: "pending",
+  });
+
+  return {
+    nextTriplet: JSONify<TTriplet | undefined>(triplet),
+    pendingTripletsCount,
+  };
+}
+
+export async function getTripletsCount(prevState: {
+  pendingTripletsCount: number;
+  acceptedTripletsCount: number;
+  rejectedTripletsCount: number;
+}) {
+  await dbConnect();
+
+  const pendingTripletsCount = await Triplet.countDocuments({
+    status: "pending",
+  });
+
+  const acceptedTripletsCount = await Triplet.countDocuments({
+    status: "accepted",
+  });
+
+  const rejectedTripletsCount = await Triplet.countDocuments({
+    status: "rejected",
+  });
+
+  return { pendingTripletsCount, acceptedTripletsCount, rejectedTripletsCount };
+}
+
+async function syncTripletsWithLiveblocks_terminated() {
+  // Terminated
   const triplets = await fetchTriplets();
 
-  let room = client.getRoom("triplet-ai");
+  let room = client.getRoom("triplet-ai-room"); // Unique ID to try what we are going to do
   let leave = () => {};
   // console.log("from sync", room);
 
@@ -162,11 +215,31 @@ export async function syncTripletsWithLiveblocks() {
     const initialPresence = await getInitialPresence();
 
     const { room: enteredRoom, leave: leaveEnteredRoom } = client.enterRoom(
-      "triplet-ai",
+      "triplet-ai-room", // Unique ID to try what we are going to do
       {
         initialStorage: {
-          triplets: new LiveList([]),
+          lockedTriplets: new LiveObject({
+            any: new LiveObject({
+              triplet: {
+                id: "any",
+
+                instruction: "any",
+                input: "any",
+                output: "any",
+                status: "pending",
+                _id: "any",
+                createdAt: Date.now().toLocaleString(),
+                updatedAt: Date.now().toLocaleString(),
+              } satisfies TTriplet,
+              lockedBy: {
+                id: "any",
+                picture: "any",
+                username: "any",
+              } satisfies TLockedBy,
+            }),
+          }),
           releaseRequests: new LiveObject({}),
+          pendingTripletsCount: 0,
         },
         initialPresence,
       }
@@ -178,7 +251,7 @@ export async function syncTripletsWithLiveblocks() {
 
   const storage = await room.getStorage();
 
-  storage.root.set("triplets", new LiveList(triplets));
+  // storage.root.set("triplets", new LiveList(triplets));
 
   leave();
   return;
