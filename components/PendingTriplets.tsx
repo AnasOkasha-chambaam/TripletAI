@@ -2,34 +2,45 @@
 
 import { updateTripletStatus } from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
-import { shallow, useUpdateMyPresence } from "@liveblocks/react";
-import { useOthersMapped } from "@liveblocks/react/suspense";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { ArrowDown, CheckCircle, Edit, InfoIcon, XCircle } from "lucide-react";
+import {
+  ArrowDown,
+  CheckCircle,
+  CircleIcon,
+  Edit,
+  InfoIcon,
+  Loader2,
+  XCircle,
+} from "lucide-react";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
-import { useRealtimeTriplets } from "./real-time/hooks/useRealtimeTriplets";
-import { useReleaseTriplet } from "./real-time/hooks/useReleaseTriplet";
+import useFetchAndLockNextTriplet from "./real-time/hooks/useFetchAndLockNextTriplet";
+import usePendingTriplets from "./real-time/hooks/usePendingTriplets";
 import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 
 export default function PendingTriplets() {
-  const { triplets } = useRealtimeTriplets();
+  const {
+    pendingTripletsCount,
+    lockedTriplets,
+    currentTriplet,
+    unlockTriplet,
+    lockedTripletsByOthers,
+  } = usePendingTriplets();
 
-  const { skipTriplet, isSkippedTriplet } = useSkippedTriplets();
+  const { skipTriplet } = useSkippedTriplets();
+
+  const { isGetNextTripletActionPending, isGetTripletsCountActionPending } =
+    useFetchAndLockNextTriplet();
 
   const [statusToApply, setStatusToApply] = useState<
     "accepted" | "rejected" | null
   >(null);
-
-  const [currentTriplet, setCurrentTriplet] = useState<TTriplet | null>(null);
-
-  const updateMyPresence = useUpdateMyPresence();
 
   const controls = useAnimation();
   const iconControls = {
@@ -46,54 +57,20 @@ export default function PendingTriplets() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const lockedTripletsMapped = useOthersMapped(
-    (other) => ({
-      triplet: other.presence.lockedTriplet,
-      lockedBy: other.presence.user,
-    }),
-    shallow
-  );
-
-  const lockedTriplets = Array.from(lockedTripletsMapped)
-    .filter((lt) => lt[1].triplet, shallow)
-    .map((lt) => lt[1], shallow) as TLockedTriplet[];
-
-  const pendingTriplets = triplets.filter(
-    (t) => t.status === "pending",
-    shallow
-  );
-
-  const availableTriplets = pendingTriplets.filter(
-    (t) =>
-      !lockedTriplets.find((lt) => lt.triplet._id === t._id) &&
-      !isSkippedTriplet(t),
-    shallow
-  );
-
-  useReleaseTriplet(currentTriplet);
-
-  useEffect(() => {
-    updateMyPresence({
-      lockedTriplet: currentTriplet,
-    });
-  }, [currentTriplet]);
-
-  useEffect(() => {
-    if (availableTriplets.length > 0) {
-      setCurrentTriplet(availableTriplets[0]);
-    } else {
-      setCurrentTriplet(null);
-    }
-  }, [availableTriplets]);
-
   useEffect(() => {
     if (updateState?.success) {
       if (statusToApply === "accepted") {
         toast.success("Triplet accepted successfully");
       }
       if (statusToApply === "rejected") {
-        toast.info("Triplet was rejected");
+        toast.info("Triplet was rejected", {
+          richColors: false,
+        });
       }
+      if (currentTriplet) {
+        unlockTriplet(currentTriplet._id);
+      }
+
       setStatusToApply(null);
     }
   }, [updateState]);
@@ -118,7 +95,9 @@ export default function PendingTriplets() {
         // Move to bottom of the list
         skipTriplet(currentTriplet._id);
 
-        toast.info("Triplet skipped");
+        toast.info("Triplet skipped", {
+          richColors: false,
+        });
         return;
     }
 
@@ -153,7 +132,7 @@ export default function PendingTriplets() {
     );
   };
 
-  if (pendingTriplets?.length === 0) {
+  if (pendingTripletsCount === 0) {
     return (
       <div className="flex justify-center items-center my-4">
         <Badge className="mx-auto scale-110 p-3 rounded-md" variant={"outline"}>
@@ -169,7 +148,7 @@ export default function PendingTriplets() {
     <>
       <div className="relative flex flex-row max-md:flex-col-reverse justify-center items-center gap-3">
         {lockedTriplets.length > 0 ? (
-          <EmblaCarouselClassNames slides={lockedTriplets} />
+          <EmblaCarouselClassNames slides={lockedTripletsByOthers} />
         ) : (
           <div className="flex justify-center items-center my-4 min-w-60">
             <Badge
@@ -185,7 +164,12 @@ export default function PendingTriplets() {
         <div className=" w-full">
           <div className="flex justify-center items-center my-6">
             <Badge className="mx-auto scale-110">
-              <span className="underline mr-1">{pendingTriplets.length}</span>{" "}
+              {isGetNextTripletActionPending ||
+              isGetTripletsCountActionPending ? (
+                <Loader2 className="animate-spin mr-2 size-3" />
+              ) : (
+                <span className="underline mr-1">{pendingTripletsCount}</span>
+              )}{" "}
               Pending Triplets
             </Badge>
           </div>
@@ -236,8 +220,19 @@ export default function PendingTriplets() {
                   toast.success(
                     "Triplet edited and added to the accepted list"
                   );
+                  unlockTriplet(currentTriplet._id);
                 }}
               />
+            </div>
+          ) : isGetNextTripletActionPending ? (
+            <div className="flex justify-center items-center my-4">
+              <Badge
+                className="mx-auto scale-110 p-3 rounded-md"
+                variant={"secondary"}
+              >
+                <CircleIcon className="animate-bounce mr-2 size-4 text-yellow-600" />{" "}
+                Fetching Next Triplet
+              </Badge>
             </div>
           ) : (
             <div className="flex justify-center items-center my-4">
