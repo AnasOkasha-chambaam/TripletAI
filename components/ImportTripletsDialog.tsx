@@ -18,6 +18,7 @@ import { FileDropzone } from "./FileDropzone";
 import { importTriplets } from "@/lib/actions/triplet.actions";
 import { toast } from "sonner";
 import { UploadIcon } from "lucide-react";
+import useFetchAndLockNextTriplet from "./real-time/hooks/useFetchAndLockNextTriplet";
 
 export function ImportTripletsDialog({
   successCallback,
@@ -31,6 +32,8 @@ export function ImportTripletsDialog({
     null
   );
 
+  const { refreshNextTriplet, refreshTripletCounts } =
+    useFetchAndLockNextTriplet();
   const handleFileAccepted = (acceptedFile: File) => {
     setFile(acceptedFile);
   };
@@ -51,6 +54,8 @@ export function ImportTripletsDialog({
         toast.success("Triplets imported successfully", {
           description: `${state.count} triplets have been imported as pending.`,
         });
+        refreshNextTriplet();
+        refreshTripletCounts();
         successCallback?.();
       } else {
         toast.error("Error importing triplets", {
