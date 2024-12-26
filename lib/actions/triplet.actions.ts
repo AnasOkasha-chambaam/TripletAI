@@ -3,11 +3,10 @@
 
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
-import { createClient, LiveList, LiveObject } from "@liveblocks/client";
+import { createClient } from "@liveblocks/client";
 import { parse } from "csv-parse/sync";
-import { JSONify } from "../utils";
-import { getInitialPresence } from "./liveblocks.actions";
 import { ObjectIdZodSchema } from "../schemas/helpers.zod";
+import { JSONify } from "../utils";
 
 const client = createClient({
   publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
@@ -201,58 +200,4 @@ export async function getTripletsCount(prevState: {
   });
 
   return { pendingTripletsCount, acceptedTripletsCount, rejectedTripletsCount };
-}
-
-async function syncTripletsWithLiveblocks_terminated() {
-  // Terminated
-  const triplets = await fetchTriplets();
-
-  let room = client.getRoom("triplet-ai-room"); // Unique ID to try what we are going to do
-  let leave = () => {};
-  // console.log("from sync", room);
-
-  if (!room) {
-    const initialPresence = await getInitialPresence();
-
-    const { room: enteredRoom, leave: leaveEnteredRoom } = client.enterRoom(
-      "triplet-ai-room", // Unique ID to try what we are going to do
-      {
-        initialStorage: {
-          lockedTriplets: new LiveObject({
-            any: new LiveObject({
-              triplet: {
-                id: "any",
-
-                instruction: "any",
-                input: "any",
-                output: "any",
-                status: "pending",
-                _id: "any",
-                createdAt: Date.now().toLocaleString(),
-                updatedAt: Date.now().toLocaleString(),
-              } satisfies TTriplet,
-              lockedBy: {
-                id: "any",
-                picture: "any",
-                username: "any",
-              } satisfies TLockedBy,
-            }),
-          }),
-          releaseRequests: new LiveObject({}),
-          pendingTripletsCount: 0,
-        },
-        initialPresence,
-      }
-    );
-
-    room = enteredRoom;
-    leave = leaveEnteredRoom;
-  }
-
-  const storage = await room.getStorage();
-
-  // storage.root.set("triplets", new LiveList(triplets));
-
-  leave();
-  return;
 }
