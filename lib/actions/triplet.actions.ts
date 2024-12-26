@@ -3,14 +3,9 @@
 
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
-import { createClient } from "@liveblocks/client";
 import { parse } from "csv-parse/sync";
 import { ObjectIdZodSchema } from "../schemas/helpers.zod";
 import { JSONify } from "../utils";
-
-const client = createClient({
-  publicApiKey: process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY!,
-});
 
 export async function getTripletById(tripletId: string) {
   await dbConnect();
@@ -180,7 +175,8 @@ export async function getNextTripletToLock(
   };
 }
 
-export async function getTripletsCount(prevState: {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function getTripletsCount(_prevState: {
   pendingTripletsCount: number;
   acceptedTripletsCount: number;
   rejectedTripletsCount: number;
