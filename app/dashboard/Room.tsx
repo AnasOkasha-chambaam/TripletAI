@@ -29,7 +29,6 @@ export function Room({
         initialStorage={{
           lockedTriplets: new LiveObject({}),
           releaseRequests: new LiveObject({}),
-          pendingTripletsCount: 0,
         }}
         initialPresence={initialPresence}
         id="triplet-ai-room"

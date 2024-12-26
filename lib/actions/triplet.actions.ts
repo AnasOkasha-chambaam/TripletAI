@@ -148,11 +148,16 @@ export async function fetchTriplets(): Promise<TTriplet[]> {
 
 export async function getNextTripletToLock(
   prevState: {
+    initial?: true;
     nextTriplet: TTriplet | undefined;
     pendingTripletsCount: number;
   },
   tripletIdsToSkip: string[]
-) {
+): Promise<{
+  initial?: true;
+  nextTriplet: TTriplet | undefined;
+  pendingTripletsCount: number;
+}> {
   const validatedIds = tripletIdsToSkip.filter(
     (id) => ObjectIdZodSchema.safeParse(id).success
   );
@@ -177,10 +182,16 @@ export async function getNextTripletToLock(
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getTripletsCount(_prevState: {
+  initial?: true;
   pendingTripletsCount: number;
   acceptedTripletsCount: number;
   rejectedTripletsCount: number;
-}) {
+}): Promise<{
+  initial?: true;
+  pendingTripletsCount: number;
+  acceptedTripletsCount: number;
+  rejectedTripletsCount: number;
+}> {
   await dbConnect();
 
   const pendingTripletsCount = await Triplet.countDocuments({

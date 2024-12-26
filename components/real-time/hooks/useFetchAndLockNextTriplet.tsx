@@ -28,6 +28,7 @@ const useFetchAndLockNextTriplet = () => {
     getNextTripletAction,
     isGetNextTripletActionPending,
   ] = useActionState(getNextTripletToLock, {
+    initial: true,
     nextTriplet: undefined,
     pendingTripletsCount: 0,
   });
@@ -37,12 +38,14 @@ const useFetchAndLockNextTriplet = () => {
     getTripletsCountAction,
     isGetTripletsCountActionPending,
   ] = useActionState(getTripletsCount, {
+    initial: true,
     pendingTripletsCount: 0,
     acceptedTripletsCount: 0,
     rejectedTripletsCount: 0,
   });
 
   useEffect(() => {
+    if (getNextTripletActionState.initial) return;
     const { nextTriplet, pendingTripletsCount } = getNextTripletActionState;
 
     if (nextTriplet) {
@@ -53,6 +56,8 @@ const useFetchAndLockNextTriplet = () => {
   }, [getNextTripletActionState, lockTriplet, setPendingTripletsCount]);
 
   useEffect(() => {
+    if (getTripletsCountActionState.initial) return;
+
     const { pendingTripletsCount } = getTripletsCountActionState;
 
     setPendingTripletsCount(pendingTripletsCount);

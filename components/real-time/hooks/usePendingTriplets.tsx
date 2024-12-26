@@ -103,7 +103,6 @@ const usePendingTriplets = () => {
     }
 
     storage.get("lockedTriplets").delete(tripletId);
-    toast.success("Triplet unlocked successfully");
   }, []);
 
   const forceUnlockTriplet = useMutation(({ storage }, tripletId: string) => {

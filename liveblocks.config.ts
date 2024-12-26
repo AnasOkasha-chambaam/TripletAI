@@ -26,7 +26,7 @@ declare global {
           message: string;
         }>;
       }>;
-      pendingTripletsCount: number;
+      pendingTripletsCount?: number;
     };
 
     // Custom user info set when authenticating with a secret key

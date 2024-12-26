@@ -157,7 +157,7 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
     );
 
     return () => clearTimeout(timeout);
-  }, [currentTriplet, releaseRequestOfCurrentTriplet]);
+  }, [currentTriplet, releaseRequestOfCurrentTriplet, dismissReleaseRequest]);
 
   return {
     requestRelease,
