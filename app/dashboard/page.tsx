@@ -7,13 +7,10 @@ import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getInitialPresence } from "@/lib/actions/liveblocks.actions";
-import { syncTripletsWithLiveblocks } from "@/lib/actions/triplet.actions";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
 
 export default async function Dashboard() {
-  await syncTripletsWithLiveblocks();
-
   const initialPresence = await getInitialPresence();
 
   return (
