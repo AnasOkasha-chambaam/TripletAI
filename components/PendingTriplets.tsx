@@ -95,9 +95,6 @@ export default function PendingTriplets() {
         // Move to bottom of the list
         skipTriplet(currentTriplet._id);
 
-        toast.info("Triplet skipped", {
-          richColors: false,
-        });
         return;
     }
 

@@ -20,6 +20,9 @@ declare global {
       lockedTriplets: LiveObject<{
         [tripletId: string]: LiveObject<TLockedTriplet>;
       }>;
+      skippedTriplets: LiveObject<{
+        [userId: string]: LiveObject<{ [tripletId: string]: true }>;
+      }>;
       releaseRequests: LiveObject<{
         [tripletId: string]: LiveObject<{
           requestedBy: TLockedBy;
