@@ -119,11 +119,6 @@ export const useReleaseTriplet = () => {
 
       storage.get("releaseRequests").delete(tripletId);
 
-      // clean the other triplets that may be locked by the user
-      const lockedTriplets = storage.get("lockedTriplets");
-
-      const lockedTripletsValues = Object.values(lockedTriplets.toObject());
-
       // remove the other triplets that are locked by the request owner
       removeUserOtherLockedTriplets(tripletId, receivingUser.id);
 
