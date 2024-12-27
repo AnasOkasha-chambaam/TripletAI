@@ -51,7 +51,7 @@ const useSkippedTriplets = () => {
 
       hasSkippedBefore?.set(tripletId, true);
 
-      unlockTriplet(tripletId);
+      unlockTriplet(tripletId, "skip");
 
       toast.info("Triplet skipped", {
         richColors: false,
@@ -59,6 +59,19 @@ const useSkippedTriplets = () => {
     },
     [unlockTriplet]
   );
+
+  const unSkipTriplet = useMutation(({ storage, self }, tripletId: string) => {
+    const {
+      presence: { user },
+    } = self;
+    if (!user) return;
+
+    storage.get("skippedTriplets").get(user.id)?.delete(tripletId);
+
+    toast.info("Triplet unSkipped", {
+      richColors: false,
+    });
+  }, []);
 
   const isSkippedTriplet = useMutation(
     ({ storage, self }, triplet: TTriplet) => {
@@ -83,6 +96,7 @@ const useSkippedTriplets = () => {
 
   return {
     skippedTripletIds,
+    unSkipTriplet,
     noSkippedTriplets: skippedTripletIds.length === 0,
     skipTriplet,
     isSkippedTriplet,

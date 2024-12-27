@@ -1,21 +1,41 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getSingleTriplet } from "@/lib/actions/triplet.actions";
 import { LiveObject } from "@liveblocks/client";
 import { useMutation } from "@liveblocks/react";
-import { useStorage } from "@liveblocks/react/suspense";
-import { useEffect } from "react";
+import { useSelf, useStorage } from "@liveblocks/react/suspense";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import useSkippedTriplets from "./useSkippedTriplets";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import usePendingTriplets from "./usePendingTriplets";
 
 const RELEASE_TIMEOUT = 30000; // 30 seconds in milliseconds
 
-export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
-  const { skipTriplet } = useSkippedTriplets();
+export const useReleaseTriplet = () => {
+  const { currentTriplet, removeUserOtherLockedTriplets } =
+    usePendingTriplets();
+
+  const {
+    presence: { user },
+  } = useSelf();
 
   const releaseRequests = useStorage((root) => root.releaseRequests);
 
-  const releaseRequestOfCurrentTriplet = currentTriplet
-    ? releaseRequests[currentTriplet._id]
-    : null;
+  const releaseRequestOfCurrentTriplet = useMemo(() => {
+    if (!user) return;
+
+    if (!currentTriplet) return;
+
+    const hasReleaseRequest = releaseRequests[currentTriplet._id];
+
+    if (!hasReleaseRequest) return;
+
+    const requestedByMe = hasReleaseRequest.requestedBy.id === user.id;
+
+    if (requestedByMe) return;
+
+    console.log("hasReleaseRequest", hasReleaseRequest, currentTriplet, user);
+
+    return hasReleaseRequest;
+  }, [currentTriplet, releaseRequests, user]);
 
   const requestRelease = useMutation(
     ({ storage, self }, tripletId: string, message: string) => {
@@ -52,106 +72,154 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
   );
 
   const acceptReleaseRequest = useMutation(
-    ({ storage }) => {
-      if (!currentTriplet) {
-        toast.error("No triplet to release");
-        return;
-      }
+    async ({ storage, self }, tripletId: string) => {
+      const {
+        presence: { user },
+      } = self;
+      if (!user) return;
 
-      const tripletHasAReleaseRequest = !!storage
-        .get("releaseRequests")
-        .get(currentTriplet._id);
+      const releaseRequest = storage.get("releaseRequests").get(tripletId);
 
-      if (!tripletHasAReleaseRequest) {
+      if (!releaseRequest) {
         toast.error("No release request for this triplet");
         return;
       }
 
-      skipTriplet(currentTriplet._id);
+      const lockedBy = storage
+        .get("lockedTriplets")
+        .get(tripletId)
+        ?.get("lockedBy");
 
-      storage.get("releaseRequests").delete(currentTriplet._id);
+      if (!lockedBy || lockedBy.id !== user.id) {
+        toast.error("You are not the owner of this triplet");
+        return;
+      }
+
+      const receivingUser = releaseRequest.get("requestedBy");
+
+      const triplet = await getSingleTriplet(tripletId);
+
+      if (!triplet) {
+        toast.error("Triplet not found");
+        return;
+      }
+
+      const isPending = triplet.status === "pending";
+
+      if (!isPending) {
+        toast.error("Triplet is not pending");
+        storage.get("lockedTriplets").delete(tripletId);
+        return;
+      }
+
+      storage
+        .get("lockedTriplets")
+        .get(tripletId)
+        .set("lockedBy", receivingUser);
+
+      storage.get("releaseRequests").delete(tripletId);
+
+      // clean the other triplets that may be locked by the user
+      const lockedTriplets = storage.get("lockedTriplets");
+
+      const lockedTripletsValues = Object.values(lockedTriplets.toObject());
+
+      // remove the other triplets that are locked by the request owner
+      removeUserOtherLockedTriplets(tripletId, receivingUser.id);
+
+      toast.success("Triplet moved successfully");
     },
-    [currentTriplet, skipTriplet]
+    [getSingleTriplet, removeUserOtherLockedTriplets]
   );
 
   const dismissReleaseRequest = useMutation(
-    ({ storage }) => {
+    ({ storage, self }, tripletId: string) => {
+      const {
+        presence: { user },
+      } = self;
+
+      if (!user) return;
+
+      const currentTriplet = storage.get("lockedTriplets").get(tripletId);
+
       if (!currentTriplet) {
-        toast.error("No triplet to release");
+        toast.error("Triplet not found");
         return;
       }
 
       const tripletHasAReleaseRequest = !!storage
         .get("releaseRequests")
-        .get(currentTriplet._id);
+        .get(tripletId);
 
       if (!tripletHasAReleaseRequest) {
         toast.error("No release request for this triplet");
         return;
       }
 
-      storage.get("releaseRequests").delete(currentTriplet._id);
+      if (currentTriplet.get("lockedBy").id !== user.id) {
+        toast.error("You are not the owner of this release request");
+        return;
+      }
+
+      storage.get("releaseRequests").delete(tripletId);
 
       toast.info("Release request dismissed", {
         richColors: false,
       });
     },
-    [currentTriplet]
+    []
   );
 
   useEffect(() => {
     if (!currentTriplet) return;
-    console.log("currentTriplet", currentTriplet);
-    console.log("releaseRequests", releaseRequests);
 
-    const currentTripletHasAReleaseRequest =
-      releaseRequests[currentTriplet._id];
-    if (!currentTripletHasAReleaseRequest) return;
+    if (!releaseRequestOfCurrentTriplet) return;
 
     const timeout = setTimeout(() => {
       toast.info("Release request has expired", {
         description: "Triplet has been skipped due to inactivity",
         richColors: false,
       });
-      acceptReleaseRequest();
+      acceptReleaseRequest(currentTriplet._id);
     }, RELEASE_TIMEOUT);
 
     toast(
-      `Release request from ${currentTripletHasAReleaseRequest.requestedBy.username}`,
+      `Release request from ${releaseRequestOfCurrentTriplet.requestedBy.username}`,
       {
         description: () => {
           return (
-            <div>
+            <div className="bg-card p-2 rounded-xl">
               <div className="flex gap-1 items-center">
                 <Avatar className="scale-50">
                   <AvatarImage
-                    src={currentTripletHasAReleaseRequest.requestedBy.picture}
+                    src={releaseRequestOfCurrentTriplet.requestedBy.picture}
                   />
                   <AvatarFallback>
-                    {currentTripletHasAReleaseRequest.requestedBy.username[0].toUpperCase()}
+                    {releaseRequestOfCurrentTriplet.requestedBy.username[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
-                {currentTripletHasAReleaseRequest.requestedBy.username}
+                {releaseRequestOfCurrentTriplet.requestedBy.username}
               </div>
               <p className="ml-2 p-3 bg-muted text-muted-foreground rounded">
-                {currentTripletHasAReleaseRequest.message}
+                {releaseRequestOfCurrentTriplet.message}
               </p>
             </div>
           );
         },
+        id: `release_${currentTriplet._id}`,
         duration: RELEASE_TIMEOUT,
         position: "bottom-right",
         action: {
           label: "Accept",
           onClick: () => {
             clearTimeout(timeout);
-            acceptReleaseRequest();
+            acceptReleaseRequest(currentTriplet._id);
           },
         },
         onDismiss: () => {
           clearTimeout(timeout);
-          dismissReleaseRequest();
+          dismissReleaseRequest(currentTriplet._id);
         },
       }
     );
@@ -163,6 +231,7 @@ export const useReleaseTriplet = (currentTriplet: TTriplet | null) => {
     requestRelease,
     acceptReleaseRequest,
     dismissReleaseRequest,
+    removeUserOtherLockedTriplets,
     currentTripletHasAReleaseRequest: !!releaseRequestOfCurrentTriplet,
   };
 };

@@ -180,8 +180,7 @@ export async function getNextTripletToLock(
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getTripletsCount(_prevState: {
+export async function getTripletsCount({}: {
   initial?: true;
   pendingTripletsCount: number;
   acceptedTripletsCount: number;
@@ -207,4 +206,10 @@ export async function getTripletsCount(_prevState: {
   });
 
   return { pendingTripletsCount, acceptedTripletsCount, rejectedTripletsCount };
+}
+
+export async function getSingleTriplet(tripletId: string) {
+  await dbConnect();
+  const triplet = await Triplet.findById(tripletId);
+  return JSONify<TTriplet>(triplet);
 }

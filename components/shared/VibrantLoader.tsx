@@ -37,7 +37,9 @@ export const EnhancedVibrantLoader: React.FC<IEnhancedVibrantLoaderProps> = ({
           false, // skipped intentionally
       })}
     >
-      <div className="text-xl font-bold">Preparing Triplets</div>
+      <div className="text-xl font-bold mb-2 animate-pulse">
+        Preparing Triplets
+      </div>
 
       <div className="w-64 bg-muted rounded-full p-2 shadow-lg">
         <motion.div

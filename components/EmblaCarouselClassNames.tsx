@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { EmblaOptionsType } from "embla-carousel";
+import type { EmblaOptionsType as TEmblaOptionsType } from "embla-carousel";
 import ClassNames from "embla-carousel-class-names";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -9,18 +9,20 @@ import SingleTripletCard from "./shared/SingleTripletCard";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 
-type EmblaCarouselProps = {
+type TEmblaCarouselProps = {
   slides: {
     triplet: TTriplet;
     lockedBy: TLockedBy;
   }[];
-  options?: EmblaOptionsType;
+  options?: TEmblaOptionsType;
+  requestRelease: (tripletId: string, message: string) => void;
 };
 
 export default function EmblaCarouselClassNames({
   slides,
   options,
-}: EmblaCarouselProps) {
+  requestRelease,
+}: TEmblaCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [ClassNames()]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -83,7 +85,8 @@ export default function EmblaCarouselClassNames({
             >
               <SingleTripletCard
                 triplet={slide.triplet}
-                lockedBy={slide.lockedBy} // Add this line
+                lockedBy={slide.lockedBy}
+                requestRelease={requestRelease}
               />
             </div>
           ))}

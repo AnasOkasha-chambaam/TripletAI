@@ -23,15 +23,17 @@ import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+import { useReleaseTriplet } from "./real-time/hooks/useReleaseTriplet";
 
 export default function PendingTriplets() {
   const {
     pendingTripletsCount,
-    lockedTriplets,
     currentTriplet,
     unlockTriplet,
     lockedTripletsByOthers,
   } = usePendingTriplets();
+
+  const { requestRelease } = useReleaseTriplet();
 
   const { skipTriplet } = useSkippedTriplets();
 
@@ -68,7 +70,10 @@ export default function PendingTriplets() {
         });
       }
       if (currentTriplet) {
-        unlockTriplet(currentTriplet._id);
+        unlockTriplet(
+          currentTriplet._id,
+          statusToApply === "accepted" ? "accept" : "reject"
+        );
       }
 
       setStatusToApply(null);
@@ -144,8 +149,11 @@ export default function PendingTriplets() {
   return (
     <>
       <div className="relative flex flex-row max-md:flex-col-reverse justify-center items-center gap-3">
-        {lockedTriplets.length > 0 ? (
-          <EmblaCarouselClassNames slides={lockedTripletsByOthers} />
+        {lockedTripletsByOthers.length > 0 ? (
+          <EmblaCarouselClassNames
+            slides={lockedTripletsByOthers}
+            requestRelease={requestRelease}
+          />
         ) : (
           <div className="flex justify-center items-center my-4 min-w-60">
             <Badge
@@ -217,7 +225,7 @@ export default function PendingTriplets() {
                   toast.success(
                     "Triplet edited and added to the accepted list"
                   );
-                  unlockTriplet(currentTriplet._id);
+                  unlockTriplet(currentTriplet._id, "edit");
                 }}
               />
             </div>

@@ -1,6 +1,6 @@
 import { LiveObject } from "@liveblocks/client";
 import { useMutation, useSelf, useStorage } from "@liveblocks/react/suspense";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const usePendingTriplets = () => {
@@ -15,6 +15,25 @@ const usePendingTriplets = () => {
   const lockedTriplets = useMemo(() => {
     return Object.values(lockedTripletsObject);
   }, [lockedTripletsObject]);
+
+  const removeUserOtherLockedTriplets = useMutation(
+    ({ storage }, tripletId: string, userId: string) => {
+      const lockedTriplets = storage.get("lockedTriplets");
+
+      const lockedTripletsValues = Object.values(lockedTriplets.toObject());
+
+      // remove the other triplets that are locked by the request owner
+      lockedTripletsValues.forEach((triplet) => {
+        const lockedByRequestOwner = triplet.get("lockedBy")?.id === userId;
+        const isNotTheCurrentTriplet = triplet.get("triplet")._id !== tripletId;
+
+        if (lockedByRequestOwner && isNotTheCurrentTriplet) {
+          storage.get("lockedTriplets").delete(triplet.get("triplet")._id);
+        }
+      });
+    },
+    []
+  );
 
   const lockedTripletsByOthers = useMemo(() => {
     if (!currentUser) {
@@ -83,44 +102,113 @@ const usePendingTriplets = () => {
     []
   );
 
-  const unlockTriplet = useMutation(({ storage, self }, tripletId: string) => {
-    const {
-      presence: { user },
-    } = self;
+  const unlockTriplet = useMutation(
+    (
+      { storage, self },
+      tripletId: string,
+      appliedAction: "accept" | "reject" | "edit" | "skip"
+    ) => {
+      const {
+        presence: { user },
+      } = self;
 
-    if (!user) {
-      toast.error("User not found");
-      return;
-    }
+      if (!user) {
+        toast.error("User not found");
+        return;
+      }
 
-    const isTripletLockedByMe =
-      storage.get("lockedTriplets").get(tripletId)?.get("lockedBy").id ===
-      user.id;
+      const isTripletLockedByMe =
+        storage.get("lockedTriplets").get(tripletId)?.get("lockedBy").id ===
+        user.id;
 
-    if (!isTripletLockedByMe) {
-      toast.error("Triplet is not locked by you");
-      return;
-    }
+      if (!isTripletLockedByMe) {
+        toast.error("Triplet is not locked by you");
+        return;
+      }
 
-    storage.get("lockedTriplets").delete(tripletId);
-  }, []);
+      const hasReleaseRequest = storage.get("releaseRequests").get(tripletId);
+
+      const isSkippedByCurrentUser = storage
+        .get("skippedTriplets")
+        .get(user.id)
+        .get(tripletId);
+
+      if (
+        hasReleaseRequest &&
+        isSkippedByCurrentUser &&
+        appliedAction === "skip"
+      ) {
+        storage
+          .get("lockedTriplets")
+          .get(tripletId)
+          .set("lockedBy", hasReleaseRequest.get("requestedBy"));
+        storage.get("releaseRequests").delete(tripletId);
+
+        toast.success(`Request accepted`, {
+          id: `release_${tripletId}`,
+          duration: 300,
+          action: {
+            label: "",
+            onClick(event) {},
+            actionButtonStyle: {
+              display: "none",
+              opacity: 0,
+              pointerEvents: "none",
+            },
+          },
+          actionButtonStyle: {
+            display: "none",
+            opacity: 0,
+            pointerEvents: "none",
+          },
+          richColors: true,
+          onDismiss(toast) {},
+        });
+        removeUserOtherLockedTriplets(
+          tripletId,
+          hasReleaseRequest.get("requestedBy").id
+        );
+
+        return;
+      }
+
+      if (hasReleaseRequest && appliedAction !== "skip") {
+        storage.get("releaseRequests").delete(tripletId);
+        toast.error("Request rejected", {
+          id: `release_${tripletId}`,
+          duration: 300,
+          action: {
+            label: "",
+            onClick(event) {},
+            actionButtonStyle: {
+              display: "none",
+              opacity: 0,
+              pointerEvents: "none",
+            },
+          },
+          actionButtonStyle: {
+            display: "none",
+            opacity: 0,
+            pointerEvents: "none",
+          },
+          richColors: true,
+          onDismiss(toast) {},
+        });
+      }
+
+      storage.get("lockedTriplets").delete(tripletId);
+    },
+    []
+  );
 
   const forceUnlockTriplet = useMutation(({ storage }, tripletId: string) => {
     storage.get("lockedTriplets").delete(tripletId);
+    storage.get("releaseRequests").delete(tripletId);
   }, []);
 
   const setPendingTripletsCount = useMutation(({ storage }, count: number) => {
     storage.set("pendingTripletsCount", count);
   }, []);
-
-  //   useEffect(() => {
-  //     return () => {
-  //       if (currentTriplet) {
-  //         console.log("unlocking", currentTriplet.instruction);
-  //         unlockTriplet(currentTriplet._id);
-  //       }
-  //     };
-  //   }, [currentTriplet, unlockTriplet]);
 
   return {
     pendingTripletsCount,
@@ -128,6 +216,7 @@ const usePendingTriplets = () => {
     lockedTripletsByOthers,
     setPendingTripletsCount,
     forceUnlockTriplet,
+    removeUserOtherLockedTriplets,
     currentTriplet,
     lockedTripletIds,
     lockTriplet,
