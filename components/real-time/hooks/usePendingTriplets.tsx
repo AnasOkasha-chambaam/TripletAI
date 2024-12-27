@@ -1,6 +1,6 @@
 import { LiveObject } from "@liveblocks/client";
 import { useMutation, useSelf, useStorage } from "@liveblocks/react/suspense";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 const usePendingTriplets = () => {
@@ -149,7 +149,7 @@ const usePendingTriplets = () => {
           duration: 300,
           action: {
             label: "",
-            onClick(event) {},
+            onClick() {},
             actionButtonStyle: {
               display: "none",
               opacity: 0,
@@ -162,7 +162,7 @@ const usePendingTriplets = () => {
             pointerEvents: "none",
           },
           richColors: true,
-          onDismiss(toast) {},
+          onDismiss() {},
         });
         removeUserOtherLockedTriplets(
           tripletId,
@@ -179,7 +179,7 @@ const usePendingTriplets = () => {
           duration: 300,
           action: {
             label: "",
-            onClick(event) {},
+            onClick() {},
             actionButtonStyle: {
               display: "none",
               opacity: 0,
