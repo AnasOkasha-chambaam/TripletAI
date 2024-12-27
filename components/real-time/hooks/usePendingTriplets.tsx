@@ -192,7 +192,7 @@ const usePendingTriplets = () => {
             pointerEvents: "none",
           },
           richColors: true,
-          onDismiss(toast) {},
+          onDismiss() {},
         });
       }
 
