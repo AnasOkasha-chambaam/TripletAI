@@ -33,7 +33,7 @@ export default function PendingTriplets() {
     lockedTripletsByOthers,
   } = usePendingTriplets();
 
-  const { requestRelease } = useReleaseTriplet();
+  const {} = useReleaseTriplet();
 
   const { skipTriplet } = useSkippedTriplets();
 
@@ -150,10 +150,7 @@ export default function PendingTriplets() {
     <>
       <div className="relative flex flex-row max-md:flex-col-reverse justify-center items-center gap-3">
         {lockedTripletsByOthers.length > 0 ? (
-          <EmblaCarouselClassNames
-            slides={lockedTripletsByOthers}
-            requestRelease={requestRelease}
-          />
+          <EmblaCarouselClassNames slides={lockedTripletsByOthers} />
         ) : (
           <div className="flex justify-center items-center my-4 min-w-60">
             <Badge
