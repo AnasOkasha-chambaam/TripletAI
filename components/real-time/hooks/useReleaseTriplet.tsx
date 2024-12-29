@@ -55,7 +55,7 @@ export const useReleaseTriplet = () => {
       toast.loading(`Request sent`, {
         description: (
           <>
-            <p className="flex items-center bg-card px-2 py-2">
+            <div className="flex items-center bg-card px-2 py-2">
               Waiting for{" "}
               <Avatar className="scale-50">
                 <AvatarImage src={currentTriplet.get("lockedBy").picture} />
@@ -69,7 +69,7 @@ export const useReleaseTriplet = () => {
               >
                 {currentTriplet.get("lockedBy").username}
               </Badge>
-            </p>
+            </div>
           </>
         ),
         richColors: false,
@@ -157,8 +157,15 @@ export const useReleaseTriplet = () => {
           label: "",
           onClick: () => {},
           actionButtonStyle: {
-            display: "hidden",
+            display: "none",
+            opacity: 0,
+            pointerEvents: "none",
           },
+        },
+        actionButtonStyle: {
+          display: "none",
+          opacity: 0,
+          pointerEvents: "none",
         },
       });
     },
