@@ -31,6 +31,7 @@ export function Room({
           lockedTriplets: new LiveObject({}),
           releaseRequests: new LiveObject({}),
           skippedTriplets: new LiveObject({}),
+          answeredRequests: new LiveObject({}),
         }}
         initialPresence={initialPresence}
         id="triplet-ai-room"
