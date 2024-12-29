@@ -29,6 +29,13 @@ declare global {
           message: string;
         }>;
       }>;
+      answeredRequests: LiveObject<{
+        [tripletId: string]: LiveObject<{
+          requestedBy: TLockedBy;
+          acceptedBy: TLockedBy;
+          action: "accepted" | "rejected";
+        }>;
+      }>;
       pendingTripletsCount?: number;
     };
 
