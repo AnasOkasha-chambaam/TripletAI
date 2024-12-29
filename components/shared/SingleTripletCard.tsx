@@ -18,6 +18,7 @@ import {
   LockOpenIcon,
 } from "lucide-react";
 import React from "react";
+import { useReleaseTriplet } from "../real-time/hooks/useReleaseTriplet";
 
 interface TripletCardProps {
   triplet: TTriplet;
@@ -27,7 +28,6 @@ interface TripletCardProps {
   onSelect?: () => void;
   onEdit?: () => void;
   statusToApply?: "accepted" | "rejected" | null;
-  requestRelease?: (tripletId: string, message: string) => void;
 }
 
 const SingleTripletCard: React.FC<TripletCardProps> = ({
@@ -38,9 +38,10 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
   onSelect,
   onEdit,
   statusToApply,
-  requestRelease,
 }) => {
   const tripletType = triplet.status;
+
+  const { requestRelease } = useReleaseTriplet();
 
   return (
     <Card
@@ -109,7 +110,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
           <Button
             variant={"outline"}
             onClick={() =>
-              requestRelease?.(
+              requestRelease(
                 triplet._id,
                 "Please, pass this triplet for me to view it."
               )
