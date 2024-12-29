@@ -23,7 +23,7 @@ export const EnhancedVibrantLoader: React.FC<IEnhancedVibrantLoaderProps> = ({
           onComplete?.();
           return 100;
         }
-        return prevProgress + 10;
+        return prevProgress + 3;
       });
     }, duration / 100);
 
