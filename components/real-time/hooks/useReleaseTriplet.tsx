@@ -6,6 +6,7 @@ import { useSelf, useStorage } from "@liveblocks/react/suspense";
 import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import usePendingTriplets from "./usePendingTriplets";
+import { Badge } from "@/components/ui/badge";
 
 const RELEASE_TIMEOUT = 30000; // 30 seconds in milliseconds
 
@@ -37,12 +38,57 @@ export const useReleaseTriplet = () => {
     return hasReleaseRequest;
   }, [currentTriplet, releaseRequests, user]);
 
+  const releaseRequestOfCurrentUser = useMemo(() => {
+    if (!user) return;
+
+    const releaseRequest = Object.values(releaseRequests).find(
+      (request) => request.requestedBy.id === user.id
+    );
+
+    return releaseRequest;
+  }, [releaseRequests, user]);
+
   const requestRelease = useMutation(
     ({ storage, self }, tripletId: string, message: string) => {
-      toast.info("Test: " + tripletId, {
-        description: message,
+      const currentTriplet = storage.get("lockedTriplets").get(tripletId);
+
+      toast.loading(`Request sent`, {
+        description: (
+          <>
+            <p className="flex items-center bg-card px-2 py-2">
+              Waiting for{" "}
+              <Badge
+                variant={"outline"}
+                className="items-center scale-75 rounded-md"
+              >
+                <Avatar className="scale-50">
+                  <AvatarImage src={currentTriplet.get("lockedBy").picture} />
+                  <AvatarFallback>
+                    {currentTriplet.get("lockedBy").username[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>{" "}
+                {currentTriplet.get("lockedBy").username}
+              </Badge>
+            </p>
+          </>
+        ),
         richColors: false,
+        id: `request_${tripletId}`,
+        closeButton: false,
+        action: {
+          label: "Cancel",
+          onClick: (e) => {
+            e.preventDefault();
+            cancelReleaseRequest(tripletId);
+          },
+        },
       });
+
+      if (!currentTriplet) {
+        toast.error("Triplet not found");
+        return;
+      }
+
       const { presence } = self;
       if (!presence.user) {
         toast.error("You must be logged in to request a release");
@@ -67,6 +113,46 @@ export const useReleaseTriplet = () => {
           message,
         })
       );
+    },
+    []
+  );
+
+  const cancelReleaseRequest = useMutation(
+    (
+      {
+        storage,
+        self: {
+          presence: { user },
+        },
+      },
+      tripletId: string
+    ) => {
+      if (!user) {
+        toast.error("You must be logged in to cancel a release request");
+        return;
+      }
+
+      const releaseRequest = storage.get("releaseRequests").get(tripletId);
+
+      if (!releaseRequest) {
+        toast.error("No release request for this triplet");
+        return;
+      }
+
+      const isMyOwnRequest = releaseRequest.get("requestedBy").id === user.id;
+
+      if (!isMyOwnRequest) {
+        toast.error("You are not the owner of this release request");
+        return;
+      }
+
+      storage.get("releaseRequests").delete(tripletId);
+
+      toast.info("Release request canceled", {
+        richColors: false,
+        // id: `request_${tripletId}`,
+        // duration: 3000,
+      });
     },
     []
   );
@@ -228,5 +314,6 @@ export const useReleaseTriplet = () => {
     dismissReleaseRequest,
     removeUserOtherLockedTriplets,
     currentTripletHasAReleaseRequest: !!releaseRequestOfCurrentTriplet,
+    currentUserHasAReleaseRequest: !!releaseRequestOfCurrentUser,
   };
 };
