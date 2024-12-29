@@ -41,7 +41,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
 }) => {
   const tripletType = triplet.status;
 
-  const { requestRelease } = useReleaseTriplet();
+  const { requestRelease, currentUserHasAReleaseRequest } = useReleaseTriplet();
 
   return (
     <Card
@@ -116,6 +116,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
               )
             }
             className="mx-4"
+            disabled={currentUserHasAReleaseRequest}
           >
             <LockOpenIcon className="sm:mr-2" />{" "}
             <span className="hidden sm:inline">Request</span>
