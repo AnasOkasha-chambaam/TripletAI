@@ -57,16 +57,16 @@ export const useReleaseTriplet = () => {
           <>
             <p className="flex items-center bg-card px-2 py-2">
               Waiting for{" "}
+              <Avatar className="scale-50">
+                <AvatarImage src={currentTriplet.get("lockedBy").picture} />
+                <AvatarFallback>
+                  {currentTriplet.get("lockedBy").username[0].toUpperCase()}
+                </AvatarFallback>
+              </Avatar>{" "}
               <Badge
                 variant={"outline"}
                 className="items-center scale-75 rounded-md"
               >
-                <Avatar className="scale-50">
-                  <AvatarImage src={currentTriplet.get("lockedBy").picture} />
-                  <AvatarFallback>
-                    {currentTriplet.get("lockedBy").username[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>{" "}
                 {currentTriplet.get("lockedBy").username}
               </Badge>
             </p>
@@ -148,10 +148,18 @@ export const useReleaseTriplet = () => {
 
       storage.get("releaseRequests").delete(tripletId);
 
-      toast.info("Release request canceled", {
+      toast.info("Canceled", {
+        description: "",
         richColors: false,
-        // id: `request_${tripletId}`,
-        // duration: 3000,
+        id: `request_${tripletId}`,
+        duration: 3000,
+        action: {
+          label: "",
+          onClick: () => {},
+          actionButtonStyle: {
+            display: "hidden",
+          },
+        },
       });
     },
     []
