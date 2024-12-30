@@ -24,17 +24,10 @@ declare global {
         [userId: string]: LiveObject<{ [tripletId: string]: true }>;
       }>;
       releaseRequests: LiveObject<{
-        [tripletId: string]: LiveObject<{
-          requestedBy: TLockedBy;
-          message: string;
-        }>;
+        [tripletId: string]: LiveObject<TReleaseRequestValue>;
       }>;
       answeredRequests: LiveObject<{
-        [tripletId: string]: LiveObject<{
-          requestedBy: TLockedBy;
-          acceptedBy: TLockedBy;
-          action: "accepted" | "rejected";
-        }>;
+        [tripletId: string]: LiveObject<TAnsweredRequestValue>;
       }>;
       pendingTripletsCount?: number;
     };
