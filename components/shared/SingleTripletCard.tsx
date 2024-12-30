@@ -15,6 +15,7 @@ import {
   EditIcon,
   Loader2Icon,
   LockKeyholeIcon,
+  LockKeyholeOpenIcon,
   LockOpenIcon,
 } from "lucide-react";
 import React from "react";
@@ -41,7 +42,20 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
 }) => {
   const tripletType = triplet.status;
 
-  const { requestRelease, currentUserHasAReleaseRequest } = useReleaseTriplet();
+  const {
+    requestRelease,
+    currentUserHasAReleaseRequest,
+    doesTheGivenTripletHaveAReleaseRequest,
+  } = useReleaseTriplet();
+
+  const thisTripletHasAReleaseRequest = doesTheGivenTripletHaveAReleaseRequest(
+    triplet._id
+  );
+
+  const isDisabled =
+    isActionPending ||
+    thisTripletHasAReleaseRequest ||
+    currentUserHasAReleaseRequest;
 
   return (
     <Card
@@ -116,9 +130,13 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
               )
             }
             className="mx-4"
-            disabled={currentUserHasAReleaseRequest}
+            disabled={isDisabled}
           >
-            <LockOpenIcon className="sm:mr-2" />{" "}
+            {thisTripletHasAReleaseRequest ? (
+              <LockKeyholeOpenIcon className="sm:mr-2 animate-pulse" />
+            ) : (
+              <LockOpenIcon className="sm:mr-2" />
+            )}{" "}
             <span className="hidden sm:inline">Request</span>
           </Button>
         )}
