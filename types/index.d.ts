@@ -29,6 +29,20 @@ declare type TLockedTriplet = {
   lockedBy: TLockedBy;
 };
 
+declare type TReleaseRequestValue = {
+  requestedBy: TLockedBy;
+  tripletId: string;
+  message: string;
+};
+
+declare type TAnsweredRequestValue = {
+  requestedBy: TLockedBy;
+  tripletId: string;
+  actionTakenBy: TLockedBy;
+  action: "accepted" | "rejected";
+  wasOwnerOffline: boolean;
+};
+
 declare type TTriplet = Omit<TTripletFields, "id"> &
   TMongoDBItem & {
     status: "pending" | "accepted" | "rejected";
