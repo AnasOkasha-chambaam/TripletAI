@@ -1,12 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { getSingleTriplet } from "@/lib/actions/triplet.actions";
 import { LiveObject } from "@liveblocks/client";
 import { useMutation } from "@liveblocks/react";
 import { useSelf, useStorage } from "@liveblocks/react/suspense";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import usePendingTriplets from "./usePendingTriplets";
-import { Badge } from "@/components/ui/badge";
 
 const RELEASE_TIMEOUT = 30000; // 30 seconds in milliseconds
 
@@ -81,6 +81,16 @@ export const useReleaseTriplet = () => {
             e.preventDefault();
             cancelReleaseRequest(tripletId);
           },
+          actionButtonStyle: {
+            display: "block",
+            opacity: 1,
+            pointerEvents: "all",
+          },
+        },
+        actionButtonStyle: {
+          display: "block",
+          opacity: 1,
+          pointerEvents: "all",
         },
       });
 
@@ -266,6 +276,24 @@ export const useReleaseTriplet = () => {
     []
   );
 
+  const doesTheGivenTripletHaveAReleaseRequest = useCallback(
+    (tripletId: string) => {
+      return !!releaseRequests[tripletId];
+    },
+    [releaseRequests]
+  );
+
+  const flushReleaseRequest = useMutation(
+    ({ storage }) => {
+      storage.set("releaseRequests", new LiveObject({}));
+    },
+    [currentTriplet]
+  );
+
+  // useEffect(() => {
+  //   flushReleaseRequest();
+  // }, []);
+
   useEffect(() => {
     if (!currentTriplet) return;
 
@@ -328,6 +356,8 @@ export const useReleaseTriplet = () => {
     acceptReleaseRequest,
     dismissReleaseRequest,
     removeUserOtherLockedTriplets,
+    doesTheGivenTripletHaveAReleaseRequest,
+    flushReleaseRequest,
     currentTripletHasAReleaseRequest: !!releaseRequestOfCurrentTriplet,
     currentUserHasAReleaseRequest: !!releaseRequestOfCurrentUser,
   };
