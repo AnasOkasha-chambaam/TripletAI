@@ -43,6 +43,8 @@ const useSkippedTriplets = () => {
           })
         );
 
+        unlockTriplet(tripletId, "skip");
+
         toast.info("Triplet skipped", {
           richColors: false,
         });
