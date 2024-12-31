@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 const RequestAcceptedOfflineToast = ({ user }: { user: TLockedBy }) => (
-  <div className="flex flex-col-reverse bg-card p-2 gap-2">
+  <div className="flex flex-col bg-card p-2 gap-2 rounded-md">
     <div className="flex items-center gap-1">
       <Avatar className="size-5">
         <AvatarImage src={user.picture} alt={user.username} />
@@ -14,14 +14,14 @@ const RequestAcceptedOfflineToast = ({ user }: { user: TLockedBy }) => (
       <Badge variant={"outline"} className="items-center rounded-md">
         {user.username}
       </Badge>{" "}
-      is offline.
+      is inactive.
     </div>
     <p>You can now view the triplet.</p>
   </div>
 );
 
 const RequestAcceptedToast = ({ user }: { user: TLockedBy }) => (
-  <div className="flex flex-col bg-card p-2 gap-2">
+  <div className="flex flex-col bg-card p-2 gap-2 rounded-md">
     <div className="flex items-center gap-1">
       <Avatar className="size-5">
         <AvatarImage src={user.picture} alt={user.username} />
