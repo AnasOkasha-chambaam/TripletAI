@@ -8,8 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import usePendingTriplets from "./usePendingTriplets";
 
-const RELEASE_TIMEOUT = 3000; // 30 seconds in milliseconds // TODO: Change this to 30 seconds
-
+const RELEASE_TIMEOUT = 15000; // 15 seconds in milliseconds
 const RequestSentToast = ({
   currentTriplet,
 }: {
