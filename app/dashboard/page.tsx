@@ -9,12 +9,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getInitialPresence } from "@/lib/actions/liveblocks.actions";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { Room } from "./Room";
+import { getLoggedInUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
+import { createTripletAIRoom, getRoom } from "@/lib/actions/room.actions";
 
-export default async function Dashboard() {
+export default async function Dashboard({}: {
+  params: Promise<{
+    // roomId: string;
+  }>;
+}) {
   const initialPresence = await getInitialPresence();
 
+  const { user } = await getLoggedInUser();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
+  const room = await getRoom({
+    roomId: "triplet-ai-room", // TODO: Use the dynamic room id here
+    userId: user.id,
+  });
+
   return (
-    <Room initialPresence={initialPresence}>
+    <Room initialPresence={initialPresence} roomId={room.id} username={user.id}>
       <div className="min-h-screen overflow-hidden pb-28">
         <section className="container mx-auto p-4">
           <div className="flex justify-between items-center mb-6">
