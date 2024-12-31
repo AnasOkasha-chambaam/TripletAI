@@ -178,12 +178,15 @@ export default function PendingTriplets() {
               Pending Triplets
             </Badge>
           </div>
-          {currentTriplet ? (
+          {currentTriplet || true ? (
             <div
               className={cn(
                 "relative flex flex-row justify-center items-center gap-3",
                 {
-                  "pointer-events-none": isEditDisabled,
+                  "pointer-events-none":
+                    isEditDisabled ||
+                    isGetNextTripletActionPending ||
+                    !currentTriplet,
                 }
               )}
             >
@@ -196,7 +199,8 @@ export default function PendingTriplets() {
                   className="relative z-30 group"
                 >
                   <SingleTripletCard
-                    triplet={currentTriplet}
+                    isLoading={isGetNextTripletActionPending}
+                    triplet={currentTriplet || null}
                     isActionPending={isEditDisabled}
                     statusToApply={statusToApply}
                   />
@@ -216,29 +220,32 @@ export default function PendingTriplets() {
                   <ArrowDown className="size-5" /> Skip
                 </div>
               </div>
-              <AddOrEditTripletDialog
-                triplet={currentTriplet}
-                openExternal={isEditModalOpen}
-                setOpenExternal={setIsEditModalOpen}
-                successCallback={() => {
-                  toast.success(
-                    "Triplet edited and added to the accepted list"
-                  );
-                  unlockTriplet(currentTriplet._id, "edit");
-                }}
-              />
-            </div>
-          ) : isGetNextTripletActionPending ? (
-            <div className="flex justify-center items-center my-4">
-              <Badge
-                className="mx-auto scale-110 p-3 rounded-md"
-                variant={"secondary"}
-              >
-                <CircleIcon className="animate-bounce mr-2 size-4 text-yellow-600" />{" "}
-                Fetching Next Triplet
-              </Badge>
+              {currentTriplet && (
+                <AddOrEditTripletDialog
+                  triplet={currentTriplet}
+                  openExternal={isEditModalOpen}
+                  setOpenExternal={setIsEditModalOpen}
+                  successCallback={() => {
+                    toast.success(
+                      "Triplet edited and added to the accepted list"
+                    );
+                    unlockTriplet(currentTriplet._id, "edit");
+                  }}
+                />
+              )}
             </div>
           ) : (
+            // isGetNextTripletActionPending ? (
+            //   <div className="flex justify-center items-center my-4">
+            //     <Badge
+            //       className="mx-auto scale-110 p-3 rounded-md"
+            //       variant={"secondary"}
+            //     >
+            //       <CircleIcon className="animate-bounce mr-2 size-4 text-yellow-600" />{" "}
+            //       Fetching Next Triplet
+            //     </Badge>
+            //   </div>
+            // ) :
             <div className="flex justify-center items-center my-4">
               <Badge
                 className="mx-auto scale-110 p-3 rounded-md"

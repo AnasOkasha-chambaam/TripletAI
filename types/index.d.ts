@@ -90,5 +90,22 @@ declare type TUser = TMongoDBItem & {
   picture: string;
 };
 
+declare type TTripletCardProps = {
+  triplet: TTriplet | null;
+  isLoading?: boolean;
+
+  lockedBy?: TLockedBy;
+
+  isActionPending?: boolean;
+
+  isSelected?: boolean;
+
+  onSelect?: () => void;
+
+  onEdit?: () => void;
+
+  statusToApply?: "accepted" | "rejected" | null;
+};
+
 /* Liveblocks */
 declare type TLiveblocks = Liveblocks;

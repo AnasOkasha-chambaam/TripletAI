@@ -13,16 +13,19 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
   EditIcon,
+  InfoIcon,
   Loader2Icon,
   LockKeyholeIcon,
   LockKeyholeOpenIcon,
   LockOpenIcon,
 } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { useReleaseTriplet } from "../real-time/hooks/useReleaseTriplet";
+import { LoaderOfTripletCard } from "../LoaderOfTripletCard";
 
 interface TripletCardProps {
-  triplet: TTriplet;
+  triplet: TTriplet | null;
+  isLoading?: boolean;
   lockedBy?: TLockedBy;
   isActionPending?: boolean;
   isSelected?: boolean;
@@ -33,6 +36,7 @@ interface TripletCardProps {
 
 const SingleTripletCard: React.FC<TripletCardProps> = ({
   triplet,
+  isLoading = false,
   lockedBy,
   isActionPending = false,
   isSelected,
@@ -40,7 +44,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
   onEdit,
   statusToApply,
 }) => {
-  const tripletType = triplet.status;
+  const tripletType = triplet?.status;
 
   const {
     requestRelease,
@@ -48,9 +52,10 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     doesTheGivenTripletHaveAReleaseRequest,
   } = useReleaseTriplet();
 
-  const thisTripletHasAReleaseRequest = doesTheGivenTripletHaveAReleaseRequest(
-    triplet._id
-  );
+  const thisTripletHasAReleaseRequest = useMemo(() => {
+    if (!triplet) return false;
+    return doesTheGivenTripletHaveAReleaseRequest(triplet?._id);
+  }, [triplet]);
 
   const isDisabled =
     isActionPending ||
@@ -60,7 +65,8 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
   return (
     <Card
       className={cn("max-w-md mx-auto w-80 md:w-full md:min-w-80", {
-        "opacity-65": isActionPending || !!lockedBy,
+        "opacity-65": isActionPending || !!lockedBy || isLoading,
+        "pointer-events-none": isLoading,
         "max-sm:w-60": !!lockedBy,
       })}
     >
@@ -73,7 +79,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
                 isActionPending && statusToApply === "rejected",
             })}
           >
-            {isActionPending ? (
+            {isLoading || isActionPending ? (
               <>
                 <Loader2Icon className="animate-spin mr-2" />{" "}
                 {statusToApply === "accepted"
@@ -82,24 +88,32 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
                   ? "Rejecting Triplet"
                   : "Loading"}
               </>
+            ) : triplet === null ? (
+              <>
+                <InfoIcon className="mr-2" /> No Triplet Available
+              </>
             ) : !!lockedBy ? (
               <>
                 <LockKeyholeIcon className="mr-2" /> Locked
               </>
-            ) : (
+            ) : tripletType ? (
               tripletType.charAt(0).toUpperCase() +
               tripletType.slice(1) +
               " Triplet"
+            ) : (
+              ""
             )}
           </CardTitle>
           <CardDescription>
-            {isActionPending
+            {isLoading || isActionPending
               ? "Wait a second"
+              : triplet === null
+              ? "There are no triplets to display at the moment."
               : !!lockedBy
               ? `By: ${lockedBy.username}`
-              : triplet.status === "accepted"
+              : triplet?.status === "accepted"
               ? "Select to export"
-              : triplet.status === "rejected"
+              : triplet?.status === "rejected"
               ? "Edit and accept"
               : "Swipe to take an action"}
           </CardDescription>
@@ -109,7 +123,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
         )}
         {onSelect && (
           <Checkbox
-            id={triplet._id}
+            id={triplet?._id}
             checked={isSelected}
             onCheckedChange={onSelect}
             className="mx-7 scale-150"
@@ -123,12 +137,13 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
         {!!lockedBy && (
           <Button
             variant={"outline"}
-            onClick={() =>
+            onClick={() => {
+              if (!triplet) return;
               requestRelease(
-                triplet._id,
+                triplet?._id,
                 "Please, pass this triplet for me to view it."
-              )
-            }
+              );
+            }}
             className="mx-4"
             disabled={isDisabled}
           >
@@ -143,33 +158,45 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
       </div>
       <Separator />
       <CardContent className="p-6 flex items-center justify-between">
-        <div className="w-full">
-          <p
-            className={cn("text-sm text-muted-foreground", {
-              truncate: !!lockedBy,
-            })}
-          >
-            {triplet.instruction}
-          </p>
-          {triplet.input && triplet.input.length > 0 ? (
-            <h3
-              className={cn("mb-4 text-2xl font-bold", {
+        {isLoading ? (
+          <div className="w-full">
+            <LoaderOfTripletCard />
+          </div>
+        ) : triplet === null ? (
+          <div className="w-full">
+            <p className="text-muted-foreground text-center">
+              You can request a locked triplet, or import new triplets
+            </p>
+          </div>
+        ) : (
+          <div className="w-full">
+            <p
+              className={cn("text-sm text-muted-foreground", {
                 truncate: !!lockedBy,
               })}
             >
-              {triplet.input}
-            </h3>
-          ) : (
-            <h3 className="mb-4 text-xl font-bold opacity-25">Empty</h3>
-          )}
-          <p
-            className={cn("mb-4 p-2 pl-5 bg-muted border-l-4", {
-              truncate: !!lockedBy,
-            })}
-          >
-            {triplet.output}
-          </p>
-        </div>
+              {triplet?.instruction}
+            </p>
+            {triplet?.input && triplet?.input.length > 0 ? (
+              <h3
+                className={cn("mb-4 text-2xl font-bold", {
+                  truncate: !!lockedBy,
+                })}
+              >
+                {triplet?.input}
+              </h3>
+            ) : (
+              <h3 className="mb-4 text-xl font-bold opacity-25">Empty</h3>
+            )}
+            <p
+              className={cn("mb-4 p-2 pl-5 bg-muted border-l-4", {
+                truncate: !!lockedBy,
+              })}
+            >
+              {triplet?.output}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
