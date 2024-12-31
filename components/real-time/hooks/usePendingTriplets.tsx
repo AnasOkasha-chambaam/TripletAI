@@ -131,7 +131,7 @@ const usePendingTriplets = () => {
       const isSkippedByCurrentUser = storage
         .get("skippedTriplets")
         .get(user.id)
-        .get(tripletId);
+        ?.get(tripletId);
 
       if (
         hasReleaseRequest &&
