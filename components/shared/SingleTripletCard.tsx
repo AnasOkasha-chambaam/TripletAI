@@ -55,7 +55,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
   const thisTripletHasAReleaseRequest = useMemo(() => {
     if (!triplet) return false;
     return doesTheGivenTripletHaveAReleaseRequest(triplet?._id);
-  }, [triplet]);
+  }, [triplet, doesTheGivenTripletHaveAReleaseRequest]);
 
   const isDisabled =
     isActionPending ||

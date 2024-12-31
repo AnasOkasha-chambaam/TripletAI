@@ -6,7 +6,6 @@ import { motion, PanInfo, useAnimation } from "framer-motion";
 import {
   ArrowDown,
   CheckCircle,
-  CircleIcon,
   Edit,
   InfoIcon,
   Loader2,
@@ -17,14 +16,14 @@ import { toast } from "sonner";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 import ClearSkippedTripletsModal from "./ClearSkippedTripletsModal";
 import EmblaCarouselClassNames from "./EmblaCarouselClassNames";
+import useAnsweredRequests from "./real-time/hooks/useAnsweredRequests";
 import useFetchAndLockNextTriplet from "./real-time/hooks/useFetchAndLockNextTriplet";
 import usePendingTriplets from "./real-time/hooks/usePendingTriplets";
+import { useReleaseTriplet } from "./real-time/hooks/useReleaseTriplet";
 import useSkippedTriplets from "./real-time/hooks/useSkippedTriplets";
 import SingleTripletCard from "./shared/SingleTripletCard";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
-import { useReleaseTriplet } from "./real-time/hooks/useReleaseTriplet";
-import useAnsweredRequests from "./real-time/hooks/useAnsweredRequests";
 
 export default function PendingTriplets() {
   const {

@@ -430,9 +430,47 @@ export const useReleaseTriplet = () => {
     [currentTriplet]
   );
 
-  // useEffect(() => {
-  //   flushReleaseRequest();
-  // }, []);
+  // const unlockTripletWhenGoingOffline = useMutation(
+  //   ({ storage, self, others }) => {
+  //     const {
+  //       presence: { user },
+  //     } = self;
+
+  //     if (user) return;
+
+  //     const currentUserOtherSessions = others.filter(
+  //       (other) => other.presence.user?.id === user.id
+  //     );
+
+  //     if (currentUserOtherSessions.length > 0) return;
+
+  //     const currentLockedTriplet = Object.values(
+  //       storage.get("lockedTriplets").toObject()
+  //     ).find((triplet) => triplet.get("lockedBy").id === user.id);
+
+  //     if (!currentLockedTriplet) return;
+
+  //     const tripletId = currentLockedTriplet.get("triplet")._id;
+
+  //     const hasReleaseRequest = storage.get("releaseRequests").get(tripletId);
+
+  //     toast.warning("You are going offline. Triplet has been unlocked", {
+  //       richColors: true,
+  //       duration: 3000,
+  //       onDismiss() {
+  //         return;
+  //       },
+  //     });
+
+  //     if (hasReleaseRequest) {
+  //       acceptOthersReleaseRequest(tripletId, true);
+  //       return;
+  //     }
+
+  //     storage.get("lockedTriplets").delete(tripletId);
+  //   },
+  //   [acceptOthersReleaseRequest]
+  // );
 
   useEffect(() => {
     if (!currentTriplet) return;
@@ -541,6 +579,7 @@ export const useReleaseTriplet = () => {
     doesTheGivenTripletHaveAReleaseRequest,
     flushReleaseRequest,
     currentTripletHasAReleaseRequest: !!releaseRequestOfCurrentTriplet,
+
     currentUserHasAReleaseRequest: !!releaseRequestOfCurrentUser,
   };
 };
