@@ -58,7 +58,7 @@ async function webhookRequestHandler(req: Request) {
     return NextResponse.json({ error }, { status: 400 });
   }
 
-  NextResponse.json({ success: true }, { status: 201 });
+  return NextResponse.json({ success: true }, { status: 201 });
 }
 
 export { webhookRequestHandler as GET, webhookRequestHandler as POST };
