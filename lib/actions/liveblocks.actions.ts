@@ -1,3 +1,4 @@
+"use server";
 import { getLoggedInUser } from "./user.actions";
 
 // get initial presence
