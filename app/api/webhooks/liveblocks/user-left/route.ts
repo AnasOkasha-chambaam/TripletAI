@@ -21,7 +21,13 @@ async function webhookRequestHandler(req: Request) {
 
     // Use the event data to update your room's storage
     if (event.type === "userLeft") {
-      const { roomId, userId, userInfo } = event.data;
+      const {
+        // roomId,
+        userId,
+        userInfo,
+      } = event.data;
+
+      const roomId = "triplet-ai-room";
 
       const room = await liveblocks.getRoom(roomId);
 
