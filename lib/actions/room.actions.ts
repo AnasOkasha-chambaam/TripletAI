@@ -47,8 +47,8 @@ export const createTripletAIRoom = async ({ userId }: { userId: string }) => {
 
 export const getRoom = async ({
   roomId,
-  userId,
-}: {
+}: // userId,
+{
   roomId: string;
   userId: string;
 }) => {

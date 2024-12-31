@@ -7,15 +7,15 @@ import PendingTriplets from "@/components/PendingTriplets";
 import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getInitialPresence } from "@/lib/actions/liveblocks.actions";
-import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
-import { Room } from "./Room";
+import { getRoom } from "@/lib/actions/room.actions";
 import { getLoggedInUser } from "@/lib/actions/user.actions";
+import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { createTripletAIRoom, getRoom } from "@/lib/actions/room.actions";
+import { Room } from "./Room";
 
 export default async function Dashboard({}: {
   params: Promise<{
-    // roomId: string;
+    roomId: string;
   }>;
 }) {
   const initialPresence = await getInitialPresence();
