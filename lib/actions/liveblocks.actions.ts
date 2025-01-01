@@ -49,25 +49,43 @@ export async function modifyStorage(
 }
 
 export async function removeUserLockedTriplet(roomId: string, userId: string) {
-  await modifyStorage(roomId, (root) => {
-    const lockedTripletsLiveObject = root.get("lockedTriplets");
+  console.log(`Removing locked triplets for user ${userId} in room ${roomId}`);
+  try {
+    await modifyStorage(roomId, (root) => {
+      console.log(
+        `Starting to remove locked triplets for user ${userId} in room ${roomId}`
+      );
+      const lockedTripletsLiveObject = root.get("lockedTriplets");
 
-    const lockedTriplets = Object.values(lockedTripletsLiveObject.toObject());
+      const lockedTriplets = Object.values(lockedTripletsLiveObject.toObject());
 
-    const userLockedTriplets = lockedTriplets.filter(
-      (triplet) => triplet.get("lockedBy").id === userId
-    );
+      const userLockedTriplets = lockedTriplets.filter(
+        (triplet) => triplet.get("lockedBy").id === userId
+      );
 
-    console.log(
-      `Removing ${userLockedTriplets.length} locked triplets for user ${userId}`
-    );
+      console.log(
+        `Removing ${userLockedTriplets.length} locked triplets for user ${userId}`
+      );
 
-    if (!userLockedTriplets || userLockedTriplets.length === 0) return false;
+      if (!userLockedTriplets || userLockedTriplets.length === 0) return false;
 
-    userLockedTriplets.forEach((lt) => {
-      lockedTripletsLiveObject.delete(lt.get("triplet")._id);
+      userLockedTriplets.forEach((lt) => {
+        lockedTripletsLiveObject.delete(lt.get("triplet")._id);
+      });
+
+      return true;
     });
 
+    console.log(
+      `Successfully removed locked triplets for user ${userId} in room ${roomId}`
+    );
+
     return true;
-  });
+  } catch (error) {
+    console.error(
+      `Error removing locked triplets for user ${userId} in room ${roomId}`,
+      error
+    );
+    return false;
+  }
 }
