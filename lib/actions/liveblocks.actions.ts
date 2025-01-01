@@ -58,6 +58,10 @@ export async function removeUserLockedTriplet(roomId: string, userId: string) {
       (triplet) => triplet.get("lockedBy").id === userId
     );
 
+    console.log(
+      `Removing ${userLockedTriplets.length} locked triplets for user ${userId}`
+    );
+
     if (!userLockedTriplets || userLockedTriplets.length === 0) return false;
 
     userLockedTriplets.forEach((lt) => {
