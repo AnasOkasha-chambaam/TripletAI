@@ -50,7 +50,15 @@ async function testingLiveblocksStorage({}: Request) {
     );
   }
 
-  await removeUserLockedTriplet(roomId, userId);
+  try {
+    await removeUserLockedTriplet(roomId, userId);
+    console.log(`Done in room ${roomId}`);
+  } catch (error) {
+    console.error(
+      `Error removing locked triplets for user ${userId} in room ${roomId}`,
+      error
+    );
+  }
 
   console.log(
     `User ${userId} left the room ${roomId}, releasing their locked triplets`

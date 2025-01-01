@@ -39,9 +39,9 @@ export async function modifyStorage(
     console.log(`logging room ${roomId}`, room);
     const storageStatus = room.getStorageStatus();
 
-    console.log(
-      `Storage status in room ${roomId} is ${storageStatus} with changes: ${storageChanges}`
-    );
+    console.log(`Storage status in room ${roomId} is ${storageStatus}`, {
+      roomStorageSnapshot: room.getStorageSnapshot(),
+    });
     const { root } = await room.getStorage();
 
     console.log(
