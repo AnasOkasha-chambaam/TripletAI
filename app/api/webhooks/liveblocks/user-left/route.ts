@@ -15,10 +15,10 @@ userIdsToIgnore.add("_SERVICE_ACCOUNT");
 const webhookHandler = new WebhookHandler(LIVEBLOCKS_USER_LEFT_WEBhOOK_SECRET);
 
 async function webhookRequestHandler(req: Request) {
-  const headers = await getRouteHandlerHeaders();
-  const rawBody = await req.text();
-
   try {
+    const headers = await getRouteHandlerHeaders();
+    const rawBody = await req.text();
+
     const event = webhookHandler.verifyRequest({
       headers,
       rawBody,
@@ -29,6 +29,9 @@ async function webhookRequestHandler(req: Request) {
       const { roomId, userId } = event.data;
 
       if (userId && userIdsToIgnore.has(userId)) {
+        console.log(
+          `Ignoring user ${userId} from webhook request for room ${roomId}`
+        );
         return NextResponse.json(
           { success: true, admin: true },
           { status: 201 }
@@ -36,6 +39,7 @@ async function webhookRequestHandler(req: Request) {
       }
 
       if (!userId) {
+        console.log(`No userId found in webhook request for room ${roomId}`);
         return NextResponse.json(
           { error: "userId not found" },
           { status: 400 }
@@ -47,6 +51,9 @@ async function webhookRequestHandler(req: Request) {
       const room = await liveblocks.getRoom(roomId);
 
       if (!room) {
+        console.log(
+          `Room ${roomId} not found in webhook request for user ${userId}`
+        );
         return NextResponse.json({ error: "Room not found" }, { status: 400 });
       }
 
@@ -57,6 +64,10 @@ async function webhookRequestHandler(req: Request) {
       );
 
       if (doesLeftUserHaveOtherConnections) {
+        console.log(
+          `User ${userId} has other connections in room ${roomId}`,
+          roomUsers
+        );
         return NextResponse.json(
           { success: true, otherConnections: true },
           { status: 201 }
@@ -65,6 +76,9 @@ async function webhookRequestHandler(req: Request) {
 
       await removeUserLockedTriplet(roomId, userId);
 
+      console.log(
+        `User ${userId} left the room ${roomId}, releasing their locked triplets`
+      );
       return NextResponse.json(
         { success: true, unlocked: true, userId },
         { status: 201 }
@@ -72,9 +86,11 @@ async function webhookRequestHandler(req: Request) {
     }
   } catch (error) {
     console.error(error);
+    console.log(`Error processing webhook request: ${error}`, error);
     return NextResponse.json({ error }, { status: 400 });
   }
 
+  console.log(`No event found in webhook request`);
   return NextResponse.json({ success: true, notEvent: true }, { status: 200 });
 }
 
