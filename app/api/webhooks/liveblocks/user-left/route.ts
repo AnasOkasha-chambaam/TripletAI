@@ -18,6 +18,7 @@ async function webhookRequestHandler(req: Request) {
   try {
     const headers = await getRouteHandlerHeaders();
     const rawBody = await req.text();
+    console.log(`Received webhook request: ${rawBody}`);
 
     const event = webhookHandler.verifyRequest({
       headers,
