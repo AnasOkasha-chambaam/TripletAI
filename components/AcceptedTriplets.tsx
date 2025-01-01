@@ -2,11 +2,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import SingleTripletCard from "@/components/shared/SingleTripletCard";
-import ExportModal from "./ExportModal";
+import { Button } from "@/components/ui/button";
 import { BracesIcon, SheetIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import ExportModal from "./ExportModal";
 
 export default function AcceptedTriplets() {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
