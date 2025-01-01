@@ -1,23 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import SingleTripletCard from "@/components/shared/SingleTripletCard";
+import { useFilteringTriplets } from "@/components/hooks/useFilteringTriplets";
 import { Button } from "@/components/ui/button";
-import {
-  BracesIcon,
-  SheetIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react";
-import ExportModal from "./ExportModal";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "./ui/label";
 import {
   Pagination,
   PaginationContent,
@@ -27,39 +11,33 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { BracesIcon, SheetIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import ExportModal from "./ExportModal";
+import { LoaderOfFilteringTriplets } from "./LoaderOfFilteringTriplets";
+import { TripletGrid } from "./TripletGrid";
+import { Label } from "./ui/label";
 
 export default function AcceptedTriplets() {
-  const [triplets, setTriplets] = useState<TTriplet[]>([]);
   const [selectedTriplets, setSelectedTriplets] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  useEffect(() => {
-    fetchAcceptedTriplets();
-  }, [currentPage, sortBy, sortOrder]);
-
-  const fetchAcceptedTriplets = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        `/api/triplets?status=accepted&page=${currentPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch triplets");
-      const data = await response.json();
-      setTriplets(data.triplets);
-      setTotalPages(data.pagination.totalPages);
-    } catch (err) {
-      setError("An error occurred while fetching triplets");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { triplets, loading, error, totalPages } = useFilteringTriplets({
+    status: "accepted",
+    page: currentPage,
+    sortBy,
+    sortOrder,
+  });
 
   const handleSelectAll = () => {
     if (selectedTriplets.length === triplets.length) {
@@ -105,7 +83,15 @@ export default function AcceptedTriplets() {
     link.click();
   };
 
-  // if (loading) return <div>Loading...</div>;
+  const paginationNumbers = useMemo(() => {
+    const start = Math.max(1, currentPage - 1);
+    const end = Math.min(totalPages, currentPage + 1);
+    return Array.from(
+      { length: end - start + 1, 0: { any: 1 }, 1: { any: 1 }, 2: { any: 1 } },
+      ({}, i) => start + i
+    );
+  }, [currentPage, totalPages]);
+
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -143,7 +129,7 @@ export default function AcceptedTriplets() {
       </div>
       <div className="flex items-end justify-between space-x-2 p-2">
         <div className="flex items-center space-x-2">
-          <div className="">
+          <div>
             <Label htmlFor="sortBy">Sort By</Label>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px]">
@@ -156,7 +142,7 @@ export default function AcceptedTriplets() {
               </SelectContent>
             </Select>
           </div>
-          <div className="">
+          <div>
             <Label htmlFor="sortOrder">Order</Label>
             <Select
               value={sortOrder}
@@ -172,39 +158,64 @@ export default function AcceptedTriplets() {
             </Select>
           </div>
         </div>
-        <div className="">
+        <div className="mt-4 flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious href="#" />
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  // isActive={currentPage === 1}
+                  className={cn("cursor-pointer", {
+                    "opacity-50 pointer-events-none": currentPage === 1,
+                  })}
+                />
               </PaginationItem>
+              {currentPage > 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              {paginationNumbers.map((pageNumber) => (
+                <PaginationItem key={"page-" + pageNumber}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(pageNumber)}
+                    isActive={currentPage === pageNumber}
+                    className="cursor-pointer"
+                  >
+                    {pageNumber}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {currentPage < totalPages - 1 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
               <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  className={cn("cursor-pointer", {
+                    "opacity-50 pointer-events-none": currentPage >= totalPages,
+                  })}
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          triplets.map((triplet) => (
-            <SingleTripletCard
-              key={triplet._id}
-              triplet={triplet}
-              isSelected={selectedTriplets.includes(triplet._id)}
-              onSelect={() => handleSelect(triplet._id)}
-            />
-          ))
-        )}
-      </div>
+      {loading ? (
+        <LoaderOfFilteringTriplets />
+      ) : (
+        <TripletGrid
+          triplets={triplets}
+          onSelect={handleSelect}
+          selectedTriplets={selectedTriplets}
+        />
+      )}
     </div>
   );
 }
