@@ -35,6 +35,8 @@ export async function modifyStorage(
     const roomContext = enterRoom(roomId);
     console.log(`Entering room ${roomId} to modify storage`);
     const { room } = roomContext;
+
+    console.log(`logging room ${roomId}`, room);
     const { root } = await room.getStorage();
 
     console.log(
@@ -79,6 +81,10 @@ export async function removeUserLockedTriplet(roomId: string, userId: string) {
       );
       const lockedTripletsLiveObject = root.get("lockedTriplets");
 
+      console.log(
+        `Locked triplets for user ${userId} in room ${roomId}`,
+        lockedTripletsLiveObject.toObject()
+      );
       const lockedTriplets = Object.values(lockedTripletsLiveObject.toObject());
 
       const userLockedTriplets = lockedTriplets.filter(
