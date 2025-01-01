@@ -1,11 +1,6 @@
 import { removeUserLockedTriplet } from "@/lib/actions/liveblocks.actions";
 import { liveblocks } from "@/lib/liveblocks";
-import { WebhookHandler } from "@liveblocks/node";
-import { headers as getRouteHandlerHeaders } from "next/headers";
 import { NextResponse } from "next/server";
-
-const LIVEBLOCKS_USER_LEFT_WEBhOOK_SECRET = process.env
-  .LIVEBLOCKS_USER_LEFT_WEBhOOK_SECRET as string;
 
 const userIdsToIgnore = new Set<string>();
 
