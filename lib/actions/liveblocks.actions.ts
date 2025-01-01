@@ -28,24 +28,32 @@ export async function modifyStorage(
   roomId: string,
   storageChanges: (root: LiveObject<Liveblocks["Storage"]>) => void
 ) {
-  const roomContext = enterRoom(roomId);
-  const { room } = roomContext;
-  const { root } = await room.getStorage();
+  console.log(
+    `Modifying storage in room ${roomId} with changes: ${storageChanges}`
+  );
+  try {
+    const roomContext = enterRoom(roomId);
+    console.log(`Entering room ${roomId} to modify storage`);
+    const { room } = roomContext;
+    const { root } = await room.getStorage();
 
-  // Make storage adjustments in a batch, so they all happen at once
-  room.batch(() => {
-    storageChanges(root);
-  });
+    // Make storage adjustments in a batch, so they all happen at once
+    room.batch(() => {
+      storageChanges(root);
+    });
 
-  // If storage changes are not synchronized, wait for them to finish
-  if (room.getStorageStatus() !== "synchronized") {
-    await room.events.storageStatus.waitUntil(
-      (status) => status === "synchronized"
-    );
+    // If storage changes are not synchronized, wait for them to finish
+    if (room.getStorageStatus() !== "synchronized") {
+      await room.events.storageStatus.waitUntil(
+        (status) => status === "synchronized"
+      );
+    }
+
+    // Leave when storage has been synchronized
+    roomContext.leave();
+  } catch (error) {
+    console.error("Error modifying storage", error);
   }
-
-  // Leave when storage has been synchronized
-  roomContext.leave();
 }
 
 export async function removeUserLockedTriplet(roomId: string, userId: string) {
