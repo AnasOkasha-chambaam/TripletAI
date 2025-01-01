@@ -87,7 +87,7 @@ export async function removeUserLockedTriplet(roomId: string, userId: string) {
       const lockedTripletsLiveObject = root.get("lockedTriplets");
 
       console.log(
-        `Locked triplets for user ${userId} in room ${roomId}`,
+        `Locked triplets in room ${roomId}`,
         lockedTripletsLiveObject.toObject()
       );
       const lockedTriplets = Object.values(lockedTripletsLiveObject.toObject());
