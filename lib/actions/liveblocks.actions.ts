@@ -37,17 +37,31 @@ export async function modifyStorage(
     const { room } = roomContext;
     const { root } = await room.getStorage();
 
+    console.log(
+      `After getting root: Modifying storage in room ${roomId} with changes: ${storageChanges}`
+    );
+
     // Make storage adjustments in a batch, so they all happen at once
     room.batch(() => {
+      console.log(
+        `In Batch: Modifying storage in room ${roomId} with changes: ${storageChanges}`
+      );
       storageChanges(root);
     });
 
     // If storage changes are not synchronized, wait for them to finish
     if (room.getStorageStatus() !== "synchronized") {
+      console.log(
+        `Waiting for storage to synchronize in room ${roomId} with changes: ${storageChanges}`
+      );
       await room.events.storageStatus.waitUntil(
         (status) => status === "synchronized"
       );
     }
+
+    console.log(
+      `Storage has been synchronized in room ${roomId} with changes: ${storageChanges}`
+    );
 
     // Leave when storage has been synchronized
     roomContext.leave();
