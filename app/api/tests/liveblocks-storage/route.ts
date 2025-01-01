@@ -6,7 +6,7 @@ const userIdsToIgnore = new Set<string>();
 
 userIdsToIgnore.add("_SERVICE_ACCOUNT");
 
-async function testingLiveblocksStorage(req: Request) {
+async function testingLiveblocksStorage({}: Request) {
   const userId = "any-user-id";
   const roomId = "triplet-ai-room";
 
