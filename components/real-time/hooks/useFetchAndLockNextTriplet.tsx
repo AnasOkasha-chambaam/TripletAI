@@ -16,7 +16,7 @@ const useFetchAndLockNextTriplet = () => {
   const {
     currentTriplet,
     lockTriplet,
-    lockedTripletIds,
+    lockedTripletByOthersIds,
     setPendingTripletsCount,
   } = usePendingTriplets();
   const { skippedTripletIds } = useSkippedTriplets();
@@ -66,10 +66,18 @@ const useFetchAndLockNextTriplet = () => {
   const fetchNextTriplet = useCallback(async () => {
     if (!currentTriplet) {
       startTransition(() => {
-        getNextTripletAction([...lockedTripletIds, ...skippedTripletIds]);
+        getNextTripletAction([
+          ...lockedTripletByOthersIds,
+          ...skippedTripletIds,
+        ]);
       });
     }
-  }, [currentTriplet, lockedTripletIds, skippedTripletIds, lockTriplet]);
+  }, [
+    currentTriplet,
+    lockedTripletByOthersIds,
+    skippedTripletIds,
+    lockTriplet,
+  ]);
 
   useEffect(() => {
     fetchNextTriplet();

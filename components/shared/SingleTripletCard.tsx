@@ -22,6 +22,7 @@ import {
 import React, { useMemo } from "react";
 import { useReleaseTriplet } from "../real-time/hooks/useReleaseTriplet";
 import { LoaderOfTripletCard } from "../LoaderOfTripletCard";
+import useSkippedTriplets from "../real-time/hooks/useSkippedTriplets";
 
 interface TripletCardProps {
   triplet: TTriplet | null;
@@ -52,15 +53,23 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     doesTheGivenTripletHaveAReleaseRequest,
   } = useReleaseTriplet();
 
+  const { skippedTripletIds } = useSkippedTriplets();
+
   const thisTripletHasAReleaseRequest = useMemo(() => {
     if (!triplet) return false;
     return doesTheGivenTripletHaveAReleaseRequest(triplet?._id);
   }, [triplet, doesTheGivenTripletHaveAReleaseRequest]);
 
+  const currentTripletIsSkippedByCurrentUser = useMemo(() => {
+    if (!triplet) return false;
+    return skippedTripletIds.includes(triplet?._id);
+  }, [triplet, skippedTripletIds]);
+
   const isDisabled =
     isActionPending ||
     thisTripletHasAReleaseRequest ||
-    currentUserHasAReleaseRequest;
+    currentUserHasAReleaseRequest ||
+    currentTripletIsSkippedByCurrentUser;
 
   return (
     <Card

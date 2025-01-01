@@ -1,5 +1,10 @@
 import { LiveObject } from "@liveblocks/client";
-import { useMutation, useSelf, useStorage } from "@liveblocks/react/suspense";
+import {
+  useMutation,
+  useOthersMapped,
+  useSelf,
+  useStorage,
+} from "@liveblocks/react/suspense";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +12,8 @@ const usePendingTriplets = () => {
   const {
     presence: { user: currentUser },
   } = useSelf();
+
+  const connectedUsersIds = useOthersMapped((other) => other.presence.user?.id);
 
   const pendingTripletsCount = useStorage((root) => root.pendingTripletsCount);
 
@@ -40,13 +47,15 @@ const usePendingTriplets = () => {
       return [];
     }
     return lockedTriplets.filter(
-      (triplet) => triplet.lockedBy.id !== currentUser.id
+      (lt) =>
+        lt.lockedBy.id !== currentUser.id &&
+        connectedUsersIds.some((cui) => cui[1] === lt.lockedBy.id)
     );
-  }, [lockedTriplets, currentUser]);
+  }, [lockedTriplets, currentUser, connectedUsersIds]);
 
-  const lockedTripletIds = useMemo(() => {
-    return lockedTriplets.map((triplet) => triplet.triplet._id);
-  }, [lockedTriplets]);
+  const lockedTripletByOthersIds = useMemo(() => {
+    return lockedTripletsByOthers.map((triplet) => triplet.triplet._id);
+  }, [lockedTripletsByOthers]);
 
   const currentTriplet = useMemo(() => {
     if (!currentUser) {
@@ -58,7 +67,11 @@ const usePendingTriplets = () => {
   }, [lockedTriplets, currentUser]);
 
   const lockTriplet = useMutation(
-    ({ storage, self }, triplet: TTriplet, pendingTripletsCount: number) => {
+    (
+      { storage, self, others },
+      triplet: TTriplet,
+      pendingTripletsCount: number
+    ) => {
       const {
         presence: { user },
       } = self;
@@ -72,7 +85,9 @@ const usePendingTriplets = () => {
 
       const isTripletLocked = storage.get("lockedTriplets").get(triplet._id); // Checking if the triplet is already locked by another user
 
-      const isLockedByMe = isTripletLocked?.get("lockedBy").id === user.id;
+      const tripletOwnerId = isTripletLocked?.get("lockedBy").id;
+
+      const isLockedByMe = user.id === tripletOwnerId;
 
       if (isLockedByMe) {
         toast.info("You locked this triplet.", {
@@ -82,7 +97,11 @@ const usePendingTriplets = () => {
         return;
       }
 
-      if (isTripletLocked) {
+      const isTripletOwnerOnline = others.some(
+        (other) => other.presence.user?.id === tripletOwnerId
+      );
+
+      if (isTripletLocked && isTripletOwnerOnline) {
         toast.error("Triplet is already locked by another user");
         return;
       }
@@ -218,7 +237,7 @@ const usePendingTriplets = () => {
     forceUnlockTriplet,
     removeUserOtherLockedTriplets,
     currentTriplet,
-    lockedTripletIds,
+    lockedTripletByOthersIds,
     lockTriplet,
     unlockTriplet,
   };
