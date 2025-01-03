@@ -117,12 +117,9 @@ export default function AcceptedTriplets() {
             disabled={!triplets.length}
             className="mr-2"
           >
-            {
-              // selectedTriplets.size === triplets.length && triplets.length > 0
-              //   ? "Deselect All on Page"
-              //   :
-              "Select All on Page"
-            }
+            {selectedTriplets.size === triplets.length && triplets.length > 0
+              ? "Deselect All on Page"
+              : "Select All on Page"}
           </Button>
           <Button
             onClick={handleDeselectAll}
@@ -144,7 +141,7 @@ export default function AcceptedTriplets() {
         </div>
       </div>
       <div className="mb-4 space-y-4">
-        <div className="flex justify-between items-center max-sm:flex-col max-sm:items-center">
+        <div className="flex justify-between items-center max-sm:flex-col max-sm:items-center gap-2">
           <SearchInput
             value={searchQuery}
             onChange={setSearchQuery}
