@@ -36,7 +36,7 @@ export function ShowSelectedTripletsModal({
           disabled={selectedTriplets.size === 0}
         >
           <ScanIcon className="mr-2" />
-          Show Selected Triplets
+          Show Selected Triplet IDs
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">

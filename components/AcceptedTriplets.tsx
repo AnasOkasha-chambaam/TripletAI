@@ -144,7 +144,7 @@ export default function AcceptedTriplets() {
         </div>
       </div>
       <div className="mb-4 space-y-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center max-sm:flex-col max-sm:items-center">
           <SearchInput
             value={searchQuery}
             onChange={setSearchQuery}
