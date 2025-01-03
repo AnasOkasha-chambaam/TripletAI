@@ -21,7 +21,7 @@ import {
 import { exportAllAcceptedTriplets } from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
 import { BracesIcon, SheetIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LoaderOfFilteringTriplets } from "./LoaderOfFilteringTriplets";
 import { SearchInput } from "./SearchInput";
