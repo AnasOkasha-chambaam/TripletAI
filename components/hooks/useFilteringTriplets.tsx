@@ -1,5 +1,6 @@
 import { escapeRegExp } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
+import { useDebounce } from "./useDebounce";
 
 interface UseFilteringTripletsProps {
   status: "accepted" | "rejected";
@@ -22,9 +23,11 @@ export function useFilteringTriplets({
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
   const sanitizedSearchQuery = useMemo(
-    () => escapeRegExp(searchQuery),
-    [searchQuery]
+    () => escapeRegExp(debouncedSearchQuery),
+    [debouncedSearchQuery]
   );
 
   useEffect(() => {
@@ -51,7 +54,7 @@ export function useFilteringTriplets({
     };
 
     fetchTriplets();
-  }, [status, page, sortBy, sortOrder, searchQuery]);
+  }, [status, page, sortBy, sortOrder, sanitizedSearchQuery]);
 
   return { triplets, loading, error, totalPages, totalItems };
 }
