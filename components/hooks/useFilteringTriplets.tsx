@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 
-interface UseTripletProps {
+interface UseFilteringTripletsProps {
   status: "accepted" | "rejected";
   page: number;
   sortBy: string;
   sortOrder: "asc" | "desc";
+  searchQuery: string;
 }
 
 export function useFilteringTriplets({
@@ -12,7 +13,8 @@ export function useFilteringTriplets({
   page,
   sortBy,
   sortOrder,
-}: UseTripletProps) {
+  searchQuery,
+}: UseFilteringTripletsProps) {
   const [triplets, setTriplets] = useState<TTriplet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,9 @@ export function useFilteringTriplets({
       setError(null);
       try {
         const response = await fetch(
-          `/api/triplets?status=${status}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+          `/api/triplets?status=${status}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&search=${encodeURIComponent(
+            searchQuery
+          )}`
         );
         if (!response.ok) throw new Error("Failed to fetch triplets");
         const data = await response.json();
@@ -39,7 +43,7 @@ export function useFilteringTriplets({
     };
 
     fetchTriplets();
-  }, [status, page, sortBy, sortOrder]);
+  }, [status, page, sortBy, sortOrder, searchQuery]);
 
   return { triplets, loading, error, totalPages };
 }

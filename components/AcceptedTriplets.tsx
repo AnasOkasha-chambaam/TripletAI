@@ -25,18 +25,21 @@ import ExportModal from "./ExportModal";
 import { LoaderOfFilteringTriplets } from "./LoaderOfFilteringTriplets";
 import { TripletGrid } from "./TripletGrid";
 import { Label } from "./ui/label";
+import { SearchInput } from "./SearchInput";
 
 export default function AcceptedTriplets() {
   const [selectedTriplets, setSelectedTriplets] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { triplets, loading, error, totalPages } = useFilteringTriplets({
     status: "accepted",
     page: currentPage,
     sortBy,
     sortOrder,
+    searchQuery,
   });
 
   const handleSelectAll = () => {
@@ -97,8 +100,8 @@ export default function AcceptedTriplets() {
   return (
     <div>
       <div className="mb-6 flex justify-between items-center">
-        <Button onClick={handleSelectAll}>
-          {selectedTriplets.length === triplets.length
+        <Button onClick={handleSelectAll} disabled={!triplets.length}>
+          {selectedTriplets.length === triplets.length && triplets.length > 0
             ? "Deselect All"
             : "Select All"}
         </Button>
@@ -127,91 +130,99 @@ export default function AcceptedTriplets() {
           disabled={!selectedTriplets.length}
         />
       </div>
-      <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">
-        <div className="flex items-center space-x-2">
-          <div>
-            <Label htmlFor="sortBy">Sort By</Label>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] max-sm:w-[130px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="createdAt">Created At</SelectItem>
-                <SelectItem value="input">Input</SelectItem>
-                <SelectItem value="output">Output</SelectItem>
-              </SelectContent>
-            </Select>
+      <div className="mb-4 space-y-4">
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search accepted triplets..."
+          className="w-80"
+        />
+        <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">
+          <div className="flex items-center space-x-2">
+            <div>
+              <Label htmlFor="sortBy">Sort By</Label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[180px] max-sm:w-[130px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="createdAt">Created At</SelectItem>
+                  <SelectItem value="input">Input</SelectItem>
+                  <SelectItem value="output">Output</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="sortOrder">Order</Label>
+              <Select
+                value={sortOrder}
+                onValueChange={(value) => setSortOrder(value as "asc" | "desc")}
+              >
+                <SelectTrigger className="w-[180px] max-sm:w-[130px]">
+                  <SelectValue placeholder="Sort order" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="asc">Ascending</SelectItem>
+                  <SelectItem value="desc">Descending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="sortOrder">Order</Label>
-            <Select
-              value={sortOrder}
-              onValueChange={(value) => setSortOrder(value as "asc" | "desc")}
-            >
-              <SelectTrigger className="w-[180px] max-sm:w-[130px]">
-                <SelectValue placeholder="Sort order" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="asc">Ascending</SelectItem>
-                <SelectItem value="desc">Descending</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="mt-4 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    // isActive={currentPage === 1}
+                    className={cn(
+                      "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
+                      {
+                        "opacity-50 pointer-events-none": currentPage === 1,
+                      }
+                    )}
+                  />
+                </PaginationItem>
+                {currentPage > 2 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                {paginationNumbers.map((pageNumber) => (
+                  <PaginationItem key={"page-" + pageNumber}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(pageNumber)}
+                      isActive={currentPage === pageNumber}
+                      className="cursor-pointer"
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                {currentPage < totalPages - 1 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    className={cn(
+                      "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
+                      {
+                        "opacity-50 pointer-events-none":
+                          currentPage >= totalPages,
+                      }
+                    )}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
-        </div>
-        <div className="mt-4 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  // isActive={currentPage === 1}
-                  className={cn(
-                    "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
-                    {
-                      "opacity-50 pointer-events-none": currentPage === 1,
-                    }
-                  )}
-                />
-              </PaginationItem>
-              {currentPage > 2 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-              {paginationNumbers.map((pageNumber) => (
-                <PaginationItem key={"page-" + pageNumber}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(pageNumber)}
-                    isActive={currentPage === pageNumber}
-                    className="cursor-pointer"
-                  >
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              {currentPage < totalPages - 1 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  className={cn(
-                    "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
-                    {
-                      "opacity-50 pointer-events-none":
-                        currentPage >= totalPages,
-                    }
-                  )}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
         </div>
       </div>
       {loading ? (
