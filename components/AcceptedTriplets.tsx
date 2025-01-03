@@ -127,12 +127,12 @@ export default function AcceptedTriplets() {
           disabled={!selectedTriplets.length}
         />
       </div>
-      <div className="flex items-end justify-between space-x-2 p-2">
+      <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">
         <div className="flex items-center space-x-2">
           <div>
             <Label htmlFor="sortBy">Sort By</Label>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] max-sm:w-[130px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -148,7 +148,7 @@ export default function AcceptedTriplets() {
               value={sortOrder}
               onValueChange={(value) => setSortOrder(value as "asc" | "desc")}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] max-sm:w-[130px]">
                 <SelectValue placeholder="Sort order" />
               </SelectTrigger>
               <SelectContent>
@@ -167,9 +167,12 @@ export default function AcceptedTriplets() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   // isActive={currentPage === 1}
-                  className={cn("cursor-pointer", {
-                    "opacity-50 pointer-events-none": currentPage === 1,
-                  })}
+                  className={cn(
+                    "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
+                    {
+                      "opacity-50 pointer-events-none": currentPage === 1,
+                    }
+                  )}
                 />
               </PaginationItem>
               {currentPage > 2 && (
@@ -198,9 +201,13 @@ export default function AcceptedTriplets() {
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
-                  className={cn("cursor-pointer", {
-                    "opacity-50 pointer-events-none": currentPage >= totalPages,
-                  })}
+                  className={cn(
+                    "cursor-pointer [&>span]:hidden sm:[&>span]:inline max-sm:border max-sm:p-3",
+                    {
+                      "opacity-50 pointer-events-none":
+                        currentPage >= totalPages,
+                    }
+                  )}
                 />
               </PaginationItem>
             </PaginationContent>

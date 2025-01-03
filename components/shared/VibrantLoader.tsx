@@ -10,7 +10,7 @@ interface IEnhancedVibrantLoaderProps {
 }
 
 export const EnhancedVibrantLoader: React.FC<IEnhancedVibrantLoaderProps> = ({
-  duration = 3000,
+  duration = 10000,
   onComplete,
 }) => {
   const [progress, setProgress] = useState(0);
