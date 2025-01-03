@@ -38,7 +38,6 @@ export default function AcceptedTriplets() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showSelectedTriplets, setShowSelectedTriplets] = useState(false);
 
   const { triplets, loading, error, totalPages, totalItems } =
     useFilteringTriplets({
@@ -48,10 +47,6 @@ export default function AcceptedTriplets() {
       sortOrder,
       searchQuery,
     });
-
-  useEffect(() => {
-    if (selectedTriplets.size === 0) setShowSelectedTriplets(false);
-  }, [selectedTriplets]);
 
   const handleSelectAll = () => {
     if (selectedTriplets.size === triplets.length) {

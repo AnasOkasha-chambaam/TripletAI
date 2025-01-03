@@ -10,6 +10,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { ScanIcon, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface ShowSelectedTripletsModalProps {
   selectedTriplets: Set<string>;
@@ -20,8 +21,12 @@ export function ShowSelectedTripletsModal({
   selectedTriplets,
   onDeselect,
 }: ShowSelectedTripletsModalProps) {
+  const [showSelectedTriplets, setShowSelectedTriplets] = useState(false);
+  useEffect(() => {
+    if (selectedTriplets.size === 0) setShowSelectedTriplets(false);
+  }, [selectedTriplets]);
   return (
-    <Dialog>
+    <Dialog open={showSelectedTriplets} onOpenChange={setShowSelectedTriplets}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
