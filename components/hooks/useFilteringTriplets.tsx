@@ -19,6 +19,7 @@ export function useFilteringTriplets({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     const fetchTriplets = async () => {
@@ -34,6 +35,7 @@ export function useFilteringTriplets({
         const data = await response.json();
         setTriplets(data.triplets);
         setTotalPages(data.pagination.totalPages);
+        setTotalItems(data.pagination.totalItems);
       } catch (err) {
         setError("An error occurred while fetching triplets");
         console.error(err);
@@ -45,5 +47,5 @@ export function useFilteringTriplets({
     fetchTriplets();
   }, [status, page, sortBy, sortOrder, searchQuery]);
 
-  return { triplets, loading, error, totalPages };
+  return { triplets, loading, error, totalPages, totalItems };
 }

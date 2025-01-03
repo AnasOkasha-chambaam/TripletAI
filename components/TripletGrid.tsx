@@ -3,7 +3,7 @@ import SingleTripletCard from "@/components/shared/SingleTripletCard";
 interface TripletGridProps {
   triplets: TTriplet[];
   onSelect?: (id: string) => void;
-  selectedTriplets?: string[];
+  selectedTriplets?: Set<string>;
   onEdit?: (triplet: TTriplet) => void;
 }
 
@@ -19,7 +19,7 @@ export function TripletGrid({
         <SingleTripletCard
           key={triplet._id}
           triplet={triplet}
-          isSelected={selectedTriplets?.includes(triplet._id)}
+          isSelected={selectedTriplets?.has(triplet._id)}
           onSelect={onSelect ? () => onSelect(triplet._id) : undefined}
           onEdit={onEdit ? () => onEdit(triplet) : undefined}
         />

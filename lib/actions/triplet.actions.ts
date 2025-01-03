@@ -213,3 +213,40 @@ export async function getSingleTriplet(tripletId: string) {
   const triplet = await Triplet.findById(tripletId);
   return JSONify<TTriplet>(triplet);
 }
+
+export async function exportAllAcceptedTriplets(format: "json" | "csv") {
+  try {
+    await dbConnect();
+    const triplets = await Triplet.find({ status: "accepted" }).lean();
+
+    if (format === "json") {
+      return {
+        success: true,
+        data: JSON.stringify(triplets, null, 2),
+      };
+    } else if (format === "csv") {
+      const headers = ["input", "output", "instruction"];
+      const csvContent = [
+        headers.join(","),
+        ...triplets.map((t) =>
+          headers.map((h) => t[h as keyof TTriplet]).join(",")
+        ),
+      ].join("\n");
+      return {
+        success: true,
+        data: csvContent,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Invalid format specified",
+    };
+  } catch (error) {
+    console.error("Error exporting triplets:", error);
+    return {
+      success: false,
+      error: "An error occurred while exporting triplets",
+    };
+  }
+}
