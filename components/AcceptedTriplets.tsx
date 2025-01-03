@@ -18,17 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { exportAllAcceptedTriplets } from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
 import { BracesIcon, SheetIcon } from "lucide-react";
-import { useMemo, useState, useCallback } from "react";
-import ExportModal from "./ExportModal";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { LoaderOfFilteringTriplets } from "./LoaderOfFilteringTriplets";
-import { TripletGrid } from "./TripletGrid";
-import { Label } from "./ui/label";
 import { SearchInput } from "./SearchInput";
-import { ScrollArea } from "./ui/scroll-area";
+import { ShowSelectedTripletsModal } from "./ShowSelectedTriplets";
+import { TripletGrid } from "./TripletGrid";
 import { Badge } from "./ui/badge";
-import { exportAllAcceptedTriplets } from "@/lib/actions/triplet.actions";
+import { Label } from "./ui/label";
 
 export default function AcceptedTriplets() {
   const [selectedTriplets, setSelectedTriplets] = useState<Set<string>>(
@@ -38,6 +38,7 @@ export default function AcceptedTriplets() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSelectedTriplets, setShowSelectedTriplets] = useState(false);
 
   const { triplets, loading, error, totalPages, totalItems } =
     useFilteringTriplets({
@@ -48,6 +49,10 @@ export default function AcceptedTriplets() {
       searchQuery,
     });
 
+  useEffect(() => {
+    if (selectedTriplets.size === 0) setShowSelectedTriplets(false);
+  }, [selectedTriplets]);
+
   const handleSelectAll = () => {
     if (selectedTriplets.size === triplets.length) {
       setSelectedTriplets(new Set());
@@ -56,6 +61,10 @@ export default function AcceptedTriplets() {
         new Set([...selectedTriplets, ...triplets.map((t) => t._id)])
       );
     }
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedTriplets(new Set());
   };
 
   const handleSelect = (id: string) => {
@@ -70,23 +79,26 @@ export default function AcceptedTriplets() {
     });
   };
 
-  const handleExport = useCallback(async (format: "json" | "csv") => {
+  const handleExportAll = useCallback(async (format: "json" | "csv") => {
     try {
       const result = await exportAllAcceptedTriplets(format);
       if (result.success && result.data) {
         const blob = new Blob([result.data], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.download = `all_accepted_triplets.${format}`;
+        link.download = `all_triplets.${format}`;
         link.href = url;
         link.click();
+        toast.success(
+          `All triplets exported as ${format.toUpperCase()} successfully`
+        );
       } else {
         console.error("Export failed:", result.error);
-        // You might want to show an error message to the user here
+        toast.error(`Export failed: ${result.error}`);
       }
     } catch (error) {
       console.error("Export error:", error);
-      // You might want to show an error message to the user here
+      toast.error("An unexpected error occurred during export");
     }
   }, []);
 
@@ -103,31 +115,38 @@ export default function AcceptedTriplets() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
-        <Button onClick={handleSelectAll} disabled={!triplets.length}>
-          {selectedTriplets.size === triplets.length && triplets.length > 0
-            ? "Deselect All"
-            : "Select All"}
-        </Button>
-
-        <div className="hidden sm:block">
+      <div className="mb-6 flex justify-between items-center flex-wrap gap-2">
+        <div>
           <Button
-            onClick={() => handleExport("json")}
-            variant={"outline"}
+            onClick={handleSelectAll}
+            disabled={!triplets.length}
             className="mr-2"
           >
+            {
+              // selectedTriplets.size === triplets.length && triplets.length > 0
+              //   ? "Deselect All on Page"
+              //   :
+              "Select All on Page"
+            }
+          </Button>
+          <Button
+            onClick={handleDeselectAll}
+            disabled={selectedTriplets.size === 0}
+            variant="outline"
+          >
+            Deselect All
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => handleExportAll("json")} variant={"outline"}>
             <BracesIcon className="mr-2" />
             Export All JSON
           </Button>
-          <Button onClick={() => handleExport("csv")} variant={"outline"}>
+          <Button onClick={() => handleExportAll("csv")} variant={"outline"}>
             <SheetIcon className="mr-2" />
             Export All CSV
           </Button>
         </div>
-        <ExportModal
-          onExport={(format) => handleExport(format as "json" | "csv")}
-          disabled={false}
-        />
       </div>
       <div className="mb-4 space-y-4">
         <div className="flex justify-between items-center">
@@ -137,19 +156,16 @@ export default function AcceptedTriplets() {
             placeholder="Search accepted triplets..."
             className="w-80"
           />
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="text-sm">
             Selected: {selectedTriplets.size} / {totalItems}
           </Badge>
         </div>
-        {selectedTriplets.size > 0 && (
-          <ScrollArea className="h-20 w-full border rounded-md p-2">
-            {Array.from(selectedTriplets).map((id) => (
-              <Badge key={id} variant="outline" className="m-1">
-                {id}
-              </Badge>
-            ))}
-          </ScrollArea>
-        )}
+
+        <ShowSelectedTripletsModal
+          selectedTriplets={selectedTriplets}
+          onDeselect={handleSelect}
+        />
+
         <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">
           <div className="flex items-center space-x-2">
             <div>
