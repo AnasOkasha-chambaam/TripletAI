@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { escapeRegExp } from "@/lib/utils";
+import { useState, useEffect, useMemo } from "react";
 
 interface UseFilteringTripletsProps {
   status: "accepted" | "rejected";
@@ -21,6 +22,11 @@ export function useFilteringTriplets({
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
+  const sanitizedSearchQuery = useMemo(
+    () => escapeRegExp(searchQuery),
+    [searchQuery]
+  );
+
   useEffect(() => {
     const fetchTriplets = async () => {
       setLoading(true);
@@ -28,7 +34,7 @@ export function useFilteringTriplets({
       try {
         const response = await fetch(
           `/api/triplets?status=${status}&page=${page}&sortBy=${sortBy}&sortOrder=${sortOrder}&search=${encodeURIComponent(
-            searchQuery
+            sanitizedSearchQuery
           )}`
         );
         if (!response.ok) throw new Error("Failed to fetch triplets");

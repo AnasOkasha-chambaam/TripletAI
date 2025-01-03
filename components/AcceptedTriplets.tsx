@@ -18,22 +18,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { exportAllAcceptedTriplets } from "@/lib/actions/triplet.actions";
+import {
+  exportAllAcceptedTriplets,
+  exportSelectedTriplets,
+} from "@/lib/actions/triplet.actions";
 import { cn } from "@/lib/utils";
 import { BracesIcon, SheetIcon } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import {
+  startTransition,
+  useActionState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { toast } from "sonner";
+import { ShowSelectedTripletsModal } from "./ExportSelectedTriplets";
 import { LoaderOfFilteringTriplets } from "./LoaderOfFilteringTriplets";
 import { SearchInput } from "./SearchInput";
-import { ShowSelectedTripletsModal } from "./ShowSelectedTriplets";
 import { TripletGrid } from "./TripletGrid";
 import { Badge } from "./ui/badge";
 import { Label } from "./ui/label";
 
 export default function AcceptedTriplets() {
-  const [selectedTriplets, setSelectedTriplets] = useState<Set<string>>(
-    new Set()
-  );
+  const [selectedTriplets, setSelectedTriplets] = useState<
+    Map<string, TTriplet>
+  >(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -48,54 +58,127 @@ export default function AcceptedTriplets() {
       searchQuery,
     });
 
+  const [
+    exportAllAcceptedTripletsActionState,
+    exportAllAcceptedTripletsAction,
+    isExportAllAcceptedTripletsPending,
+  ] = useActionState(exportAllAcceptedTriplets, {
+    success: false,
+    data: "",
+    format: "json",
+    error: undefined,
+  });
+
   const handleSelectAll = () => {
-    if (selectedTriplets.size === triplets.length) {
-      setSelectedTriplets(new Set());
-    } else {
-      setSelectedTriplets(
-        new Set([...selectedTriplets, ...triplets.map((t) => t._id)])
-      );
-    }
+    setSelectedTriplets(
+      new Map([
+        ...selectedTriplets,
+        ...triplets.map((t) => [t._id, t] as [string, TTriplet]),
+      ])
+    );
   };
 
   const handleDeselectAll = () => {
-    setSelectedTriplets(new Set());
+    setSelectedTriplets(new Map());
   };
 
-  const handleSelect = (id: string) => {
+  const handleSelect = (triplet: TTriplet) => {
     setSelectedTriplets((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
+      const newMap = new Map(prev);
+      if (newMap.has(triplet._id)) {
+        newMap.delete(triplet._id);
       } else {
-        newSet.add(id);
+        newMap.set(triplet._id, triplet);
       }
-      return newSet;
+      return newMap;
     });
   };
 
-  const handleExportAll = useCallback(async (format: "json" | "csv") => {
+  useEffect(() => {
+    if (isExportAllAcceptedTripletsPending) return;
+    if (
+      exportAllAcceptedTripletsActionState.success &&
+      exportAllAcceptedTripletsActionState.data
+    ) {
+      const blob = new Blob([exportAllAcceptedTripletsActionState.data], {
+        type: "text/plain",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `all_accepted_triplets.${exportAllAcceptedTripletsActionState.format}`;
+      link.href = url;
+      link.click();
+      toast.success(
+        `All accepted triplets exported as ${exportAllAcceptedTripletsActionState.format.toUpperCase()} successfully`
+      );
+    } else if (exportAllAcceptedTripletsActionState.error) {
+      console.error(
+        "Export failed:",
+        exportAllAcceptedTripletsActionState.error
+      );
+      toast.error(
+        `Export failed: ${exportAllAcceptedTripletsActionState.error}`
+      );
+    }
+  }, [
+    exportAllAcceptedTripletsActionState,
+    isExportAllAcceptedTripletsPending,
+  ]);
+
+  const handleExportAll = useCallback((format: "json" | "csv") => {
     try {
-      const result = await exportAllAcceptedTriplets(format);
-      if (result.success && result.data) {
-        const blob = new Blob([result.data], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.download = `all_triplets.${format}`;
-        link.href = url;
-        link.click();
-        toast.success(
-          `All triplets exported as ${format.toUpperCase()} successfully`
-        );
-      } else {
-        console.error("Export failed:", result.error);
-        toast.error(`Export failed: ${result.error}`);
-      }
+      startTransition(() => {
+        exportAllAcceptedTripletsAction(format);
+      });
     } catch (error) {
       console.error("Export error:", error);
       toast.error("An unexpected error occurred during export");
     }
   }, []);
+
+  const [exportState, exportAction, isExportPending] = useActionState(
+    exportSelectedTriplets,
+    {
+      success: false,
+      data: "",
+      format: "json",
+      error: undefined,
+    }
+  );
+
+  const handleExportSelected = useCallback(
+    async (format: "json" | "csv") => {
+      try {
+        const selectedTripletsArray = Array.from(selectedTriplets.values());
+        startTransition(() => {
+          exportAction({ selectedTriplets: selectedTripletsArray, format });
+        });
+      } catch (error) {
+        console.error("Export error:", error);
+        toast.error("An unexpected error occurred during export");
+      }
+    },
+    [exportAction, selectedTriplets]
+  );
+
+  useEffect(() => {
+    if (exportState) {
+      if (exportState.success && exportState.data) {
+        const blob = new Blob([exportState.data], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `triplets.${exportState.format}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        toast.success("Triplets exported successfully");
+      } else if (exportState.error) {
+        toast.error("An unexpected error occurred during export");
+      }
+    }
+  }, [exportState]);
 
   const paginationNumbers = useMemo(() => {
     const start = Math.max(1, currentPage - 1);
@@ -117,9 +200,7 @@ export default function AcceptedTriplets() {
             disabled={!triplets.length}
             className="mr-2"
           >
-            {selectedTriplets.size === triplets.length && triplets.length > 0
-              ? "Deselect All on Page"
-              : "Select All on Page"}
+            Select All on Page
           </Button>
           <Button
             onClick={handleDeselectAll}
@@ -130,11 +211,23 @@ export default function AcceptedTriplets() {
           </Button>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => handleExportAll("json")} variant={"outline"}>
+          <Button
+            onClick={() => handleExportAll("json")}
+            variant={"outline"}
+            disabled={
+              triplets.length === 0 || isExportAllAcceptedTripletsPending
+            }
+          >
             <BracesIcon className="mr-2" />
             Export All JSON
           </Button>
-          <Button onClick={() => handleExportAll("csv")} variant={"outline"}>
+          <Button
+            onClick={() => handleExportAll("csv")}
+            variant={"outline"}
+            disabled={
+              triplets.length === 0 || isExportAllAcceptedTripletsPending
+            }
+          >
             <SheetIcon className="mr-2" />
             Export All CSV
           </Button>
@@ -148,14 +241,16 @@ export default function AcceptedTriplets() {
             placeholder="Search accepted triplets..."
             className="w-80"
           />
-          <Badge variant="secondary" className="text-sm">
-            Selected: {selectedTriplets.size} / {totalItems}
+          <Badge variant="default" className="text-sm">
+            Total: {totalItems}
           </Badge>
         </div>
 
         <ShowSelectedTripletsModal
           selectedTriplets={selectedTriplets}
           onDeselect={handleSelect}
+          onExportSelected={handleExportSelected}
+          isExporting={isExportPending}
         />
 
         <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">

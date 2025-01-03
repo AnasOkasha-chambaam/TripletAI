@@ -214,7 +214,35 @@ export async function getSingleTriplet(tripletId: string) {
   return JSONify<TTriplet>(triplet);
 }
 
-export async function exportAllAcceptedTriplets(format: "json" | "csv") {
+export async function exportAllAcceptedTriplets(
+  {}:
+    | {
+        success: boolean;
+        data: string;
+        format: "json" | "csv";
+        error: undefined;
+      }
+    | {
+        success: boolean;
+        error: string;
+        format: undefined;
+        data: undefined;
+      },
+  format: "json" | "csv"
+): Promise<
+  | {
+      success: boolean;
+      data: string;
+      format: "json" | "csv";
+      error: undefined;
+    }
+  | {
+      success: boolean;
+      error: string;
+      format: undefined;
+      data: undefined;
+    }
+> {
   try {
     await dbConnect();
     const triplets = await Triplet.find({ status: "accepted" }).lean();
@@ -223,6 +251,8 @@ export async function exportAllAcceptedTriplets(format: "json" | "csv") {
       return {
         success: true,
         data: JSON.stringify(triplets, null, 2),
+        format: "json",
+        error: undefined,
       };
     } else if (format === "csv") {
       const headers = ["input", "output", "instruction"];
@@ -235,18 +265,97 @@ export async function exportAllAcceptedTriplets(format: "json" | "csv") {
       return {
         success: true,
         data: csvContent,
+        format: "csv",
+        error: undefined,
       };
     }
 
     return {
       success: false,
       error: "Invalid format specified",
+      format: undefined,
+      data: undefined,
     };
   } catch (error) {
     console.error("Error exporting triplets:", error);
     return {
       success: false,
       error: "An error occurred while exporting triplets",
+      format: undefined,
+      data: undefined,
+    };
+  }
+}
+
+export async function exportSelectedTriplets(
+  {}:
+    | {
+        success: boolean;
+        data: string;
+        format: "json" | "csv";
+        error: undefined;
+      }
+    | {
+        success: boolean;
+        error: string;
+        format: undefined;
+        data: undefined;
+      },
+  {
+    selectedTriplets,
+    format,
+  }: { selectedTriplets: TTriplet[]; format: "json" | "csv" }
+): Promise<
+  | {
+      success: boolean;
+      data: string;
+      format: "json" | "csv";
+      error: undefined;
+    }
+  | {
+      success: boolean;
+      error: string;
+      format: undefined;
+      data: undefined;
+    }
+> {
+  try {
+    if (format === "json") {
+      return {
+        success: true,
+        data: JSON.stringify(selectedTriplets, null, 2),
+        format: "json",
+        error: undefined,
+      };
+    } else if (format === "csv") {
+      const headers = ["input", "output", "instruction"];
+      const csvContent = [
+        headers.join(","),
+        ...selectedTriplets.map((t) =>
+          headers.map((h) => t[h as keyof typeof t]).join(",")
+        ),
+      ].join("\n");
+      return {
+        success: true,
+        data: csvContent,
+        format: "csv",
+        error: undefined,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Invalid format specified",
+      data: undefined,
+      format: undefined,
+    };
+  } catch (error) {
+    console.error("Error exporting selected triplets:", error);
+    return {
+      success: false,
+      error: "An error occurred while exporting selected triplets",
+      data: undefined,
+      format: undefined,
     };
   }
 }

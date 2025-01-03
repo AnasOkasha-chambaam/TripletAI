@@ -24,6 +24,7 @@ import { useMemo, useState } from "react";
 import { AddOrEditTripletDialog } from "./AddOrEditTripletDialog";
 import { Label } from "./ui/label";
 import { SearchInput } from "./SearchInput";
+import { Badge } from "./ui/badge";
 
 export default function RejectedTriplets() {
   const [editingTriplet, setEditingTriplet] = useState<TTriplet | null>(null);
@@ -32,13 +33,14 @@ export default function RejectedTriplets() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { triplets, loading, error, totalPages } = useFilteringTriplets({
-    status: "rejected",
-    page: currentPage,
-    sortBy,
-    sortOrder,
-    searchQuery,
-  });
+  const { triplets, loading, error, totalPages, totalItems } =
+    useFilteringTriplets({
+      status: "rejected",
+      page: currentPage,
+      sortBy,
+      sortOrder,
+      searchQuery,
+    });
 
   const handleEditAndAccept = (triplet: TTriplet) => {
     setEditingTriplet(triplet);
@@ -63,12 +65,17 @@ export default function RejectedTriplets() {
   return (
     <div>
       <div className="mb-4 space-y-4">
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search rejected triplets..."
-          className="w-80"
-        />
+        <div className="flex justify-between items-center max-sm:flex-col max-sm:items-center gap-2">
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search rejected triplets..."
+            className="w-80"
+          />
+          <Badge variant="default" className="text-sm">
+            Total: {totalItems}
+          </Badge>
+        </div>
         <div className="flex items-end justify-between space-x-2 p-2 max-lg:flex-col max-lg:items-center bg-card mb-1">
           <div className="flex items-center space-x-2">
             <div>
