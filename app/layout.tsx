@@ -38,26 +38,12 @@ export const metadata: Metadata = {
       "Efficiently manage and curate your supervised learning triplets with TripletAI.",
     url: "https://yourdomain.com",
     type: "website",
-    images: [
-      {
-        url: "https://yourdomain.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "TripletAI",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "TripletAI - Supervised Learning Triplets Management",
     description:
       "Efficiently manage and curate your supervised learning triplets with TripletAI.",
-    images: [
-      {
-        url: "https://yourdomain.com/twitter-image.jpg",
-        alt: "TripletAI",
-      },
-    ],
   },
   robots: {
     index: true,
