@@ -7,7 +7,7 @@ export async function POST({}: Request) {
   // Get the current user from your database
   const { user } = await getInitialPresence();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/unauthorized");
 
   // Identify the user and return the result
   const { status, body } = await liveblocks.identifyUser(

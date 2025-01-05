@@ -23,7 +23,7 @@ export default async function Dashboard({}: {
   const { user } = await getLoggedInUser();
 
   if (!user) {
-    return redirect("/login");
+    return redirect("/unauthorized");
   }
 
   const room = await getRoom({
