@@ -59,6 +59,22 @@ export async function POST(req: Request) {
     await dbConnect();
 
     try {
+      const existingUser = await User.findOne({
+        email: email_addresses[0].email_address,
+      });
+
+      if (existingUser) {
+        existingUser.clerkId = id;
+        existingUser.username = username;
+        existingUser.picture = image_url;
+        await existingUser.save();
+        console.log("User updated in database:", existingUser);
+        return NextResponse.json(
+          { message: "User updated successfully" },
+          { status: 200 }
+        );
+      }
+
       const newUser = new User({
         clerkId: id,
         email: email_addresses[0].email_address,
