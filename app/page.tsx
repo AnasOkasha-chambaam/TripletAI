@@ -1,3 +1,4 @@
+import { HowItWorks } from "@/components/HowItWorksSection";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -73,7 +74,8 @@ export default function LandingPage() {
           </Card>
         </section>
 
-        <section className="bg-card text-card-foreground rounded-lg p-6 sm:p-8 mb-12 sm:mb-16">
+        <HowItWorks />
+        {/* <section className="bg-card text-card-foreground rounded-lg p-6 sm:p-8 mb-12 sm:mb-16">
           <h3 className="text-2xl sm:text-3xl font-bold text-primary mb-4">
             How It Works
           </h3>
@@ -83,7 +85,7 @@ export default function LandingPage() {
             <li>Easily edit and manage accepted and rejected triplets</li>
             <li>Export your curated data for AI model training</li>
           </ol>
-        </section>
+        </section> */}
 
         <section className="text-center">
           <h3 className="text-2xl sm:text-3xl font-bold text-primary mb-4">
