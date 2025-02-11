@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     await dbConnect();
-    const { data: triplets } = await request.json();
+    const triplets: TTripletFields[] = await request.json();
 
     const addingTripletsResponse = await Promise.all(
-      (triplets as TTripletFields[]).map((triplet) =>
+      triplets.map((triplet) =>
         addTriplet(null, { ...triplet, hardSetStatus: "pending" })
       )
     );
