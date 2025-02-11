@@ -15,7 +15,14 @@ export async function getTripletById(tripletId: string) {
 
 export async function addTriplet(
   prevState: TAddTripletState | null,
-  { instruction, input, output }: TTripletFields
+  {
+    instruction,
+    input,
+    output,
+    hardSetStatus,
+  }: TTripletFields & {
+    hardSetStatus?: TTriplet["status"];
+  }
 ): Promise<TAddTripletState> {
   await dbConnect();
 
@@ -25,7 +32,7 @@ export async function addTriplet(
     instruction,
     input,
     output,
-    status: "accepted",
+    status: hardSetStatus || "accepted",
   });
 
   await newTriplet.save();
