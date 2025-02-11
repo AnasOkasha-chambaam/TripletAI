@@ -52,7 +52,7 @@ export const enterRoom = (roomId: string) => {
         skippedTriplets: new LiveObject({}),
         releaseRequests: new LiveObject({}),
         answeredRequests: new LiveObject({}),
-        pendingTripletsCount: 0,
+        // pendingTripletsCount: 0,
       };
     },
   });

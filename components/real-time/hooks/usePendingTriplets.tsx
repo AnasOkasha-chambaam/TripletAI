@@ -5,7 +5,7 @@ import {
   useSelf,
   useStorage,
 } from "@liveblocks/react/suspense";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const usePendingTriplets = () => {
@@ -228,6 +228,17 @@ const usePendingTriplets = () => {
   const setPendingTripletsCount = useMutation(({ storage }, count: number) => {
     storage.set("pendingTripletsCount", count);
   }, []);
+
+  const resetLockedTriplet = useMutation(({ storage }, tripletId: string) => {
+    storage.get("lockedTriplets").delete(tripletId);
+  }, []);
+
+  // unlock current triplet if pending triplets count is 0
+  useEffect(() => {
+    if (pendingTripletsCount === 0 && currentTriplet) {
+      resetLockedTriplet(currentTriplet._id);
+    }
+  }, [pendingTripletsCount, currentTriplet]);
 
   return {
     pendingTripletsCount,
