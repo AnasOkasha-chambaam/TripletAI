@@ -1,5 +1,6 @@
 import { addTriplet } from "@/lib/actions/triplet.actions";
 import dbConnect from "@/lib/dbConnect";
+import { JSONify } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -18,6 +19,10 @@ export async function POST(request: Request) {
         { error: "Internal Server Error" },
         { status: 500 }
       );
+
+    return NextResponse.json(
+      JSONify<TAddTripletState[]>(addingTripletsResponse)
+    );
 
     // if (addingTripletsResponse[0].error)
     //   return NextResponse.json(
