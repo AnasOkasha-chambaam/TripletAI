@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
+import { addTriplet } from "@/lib/actions/triplet.actions";
 
 type TQuery = {
   status?: string;
@@ -64,10 +65,28 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    await dbConnect();
-    const triplet = await Triplet.create(body);
-    return NextResponse.json(triplet);
+    const { instruction, input, output } = await request.json();
+
+    const addingTripletResponse = await addTriplet(null, {
+      instruction,
+      input,
+      output,
+    });
+
+    if (!addingTripletResponse)
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 }
+      );
+
+    if (addingTripletResponse.error)
+      return NextResponse.json(
+        { error: addingTripletResponse.error },
+        { status: 400 }
+      );
+
+    if (addingTripletResponse.triplet)
+      return NextResponse.json(addingTripletResponse.triplet);
   } catch (error) {
     console.error("Error creating triplet:", error);
     return NextResponse.json(
