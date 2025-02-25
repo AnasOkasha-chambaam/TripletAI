@@ -1,5 +1,10 @@
 // /types/index.d.ts
 
+/* HELPERS */
+declare type TResponsePart =
+  | { type: "text"; content: string }
+  | { type: "component"; name: string; data: any };
+
 /* MONGODB */
 
 declare type TMongoDBItem = {

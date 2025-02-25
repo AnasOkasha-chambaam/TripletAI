@@ -23,6 +23,7 @@ import React, { useMemo } from "react";
 import { useReleaseTriplet } from "../real-time/hooks/useReleaseTriplet";
 import { LoaderOfTripletCard } from "../LoaderOfTripletCard";
 import useSkippedTriplets from "../real-time/hooks/useSkippedTriplets";
+import { ResponseRenderer } from "../scai-25-response-components/response/ResponseRenderer";
 
 interface TripletCardProps {
   triplet: TTriplet | null;
@@ -70,6 +71,8 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     thisTripletHasAReleaseRequest ||
     currentUserHasAReleaseRequest ||
     currentTripletIsSkippedByCurrentUser;
+
+  const JSONResponse = JSON.parse(triplet?.output || "0");
 
   return (
     <Card
@@ -197,13 +200,26 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
             ) : (
               <h3 className="mb-4 text-xl font-bold opacity-25">Empty</h3>
             )}
-            <p
+            {/* <p
               className={cn("mb-4 p-2 pl-5 bg-muted border-l-4", {
                 truncate: !!lockedBy,
               })}
-            >
-              {triplet?.output}
-            </p>
+            > */}
+            {typeof JSONResponse === "string" ? (
+              <p>{JSONResponse}</p>
+            ) : typeof Array.isArray(JSONResponse) ? (
+              <ResponseRenderer response={JSONResponse} />
+            ) : (
+              <p
+                className={cn("mb-4 p-2 pl-5 bg-muted border-l-4", {
+                  truncate: !!lockedBy,
+                })}
+              >
+                No Valid JSON Response
+              </p>
+            )}
+            {/* {triplet?.output} */}
+            {/* </p> */}
           </div>
         )}
       </CardContent>
