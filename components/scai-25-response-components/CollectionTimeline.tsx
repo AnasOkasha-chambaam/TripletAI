@@ -1,8 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 interface Perfume {
   name: string;
-  launchYear?: number;
+  // launchYear?: number;
+  picture: string;
 }
 
 interface CollectionTimelineProps {
@@ -17,11 +19,12 @@ export function CollectionTimeline({ timelineItems }: CollectionTimelineProps) {
           <CardContent className="p-4">
             <div className="flex justify-between items-center">
               <span className="font-semibold">{perfume.name}</span>
-              {perfume.launchYear && (
-                <span className="text-sm text-muted-foreground">
-                  {perfume.launchYear}
-                </span>
-              )}
+              <Image
+                src={perfume.picture}
+                alt={perfume.name}
+                width={50}
+                height={50}
+              />
             </div>
           </CardContent>
         </Card>
