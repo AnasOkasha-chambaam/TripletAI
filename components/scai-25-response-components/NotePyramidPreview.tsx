@@ -5,9 +5,9 @@ export function NotePyramidPreview({
   note,
 }: {
   note: {
-    top: { _id: string; name: string }[];
-    middle: { _id: string; name: string }[];
-    base: { _id: string; name: string }[];
+    top: { name: string; avatar: string }[];
+    middle: { name: string; avatar: string }[];
+    base: { name: string; avatar: string }[];
   };
 }) {
   return (
@@ -27,15 +27,18 @@ const NoteColumn = ({
 }: {
   title: string;
   notes: {
-    _id: string;
     name: string;
+    avatar: string;
   }[];
 }) => (
   <div>
     <h3 className="text-sm font-medium mb-2">{title}</h3>
     <div className="space-y-1">
-      {notes.slice(0, 3).map((note) => (
-        <div key={note._id} className="text-sm text-muted-foreground">
+      {notes.slice(0, 3).map((note, index) => (
+        <div
+          key={index + "-" + note.avatar}
+          className="text-sm text-muted-foreground"
+        >
           {note.name}
         </div>
       ))}
