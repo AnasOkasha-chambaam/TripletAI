@@ -72,7 +72,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     currentUserHasAReleaseRequest ||
     currentTripletIsSkippedByCurrentUser;
 
-  const JSONResponse = JSON.parse(triplet?.output || "0");
+  const JSONResponse = JSON.parse(triplet?.output?.trim() || "0");
 
   return (
     <Card
