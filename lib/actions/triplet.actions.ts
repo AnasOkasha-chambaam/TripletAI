@@ -366,3 +366,12 @@ export async function exportSelectedTriplets(
     };
   }
 }
+
+export async function checkIfTripletIsPending(id: string) {
+  await dbConnect();
+  const triplet = await Triplet.findById(id);
+  if (!triplet) {
+    return false;
+  }
+  return triplet.status === "pending";
+}
