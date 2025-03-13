@@ -68,7 +68,6 @@ export async function POST(req: Request) {
         existingUser.username = username;
         existingUser.picture = image_url;
         await existingUser.save();
-        console.log("User updated in database:", existingUser);
         return NextResponse.json(
           { message: "User updated successfully" },
           { status: 200 }
