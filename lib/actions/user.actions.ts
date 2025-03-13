@@ -9,7 +9,6 @@ import { auth } from "@clerk/nextjs/server";
 export async function getLoggedInUser() {
   const { userId: clerkId } = await auth();
 
-  console.log("clerkId", clerkId);
   if (!clerkId) {
     return { success: false, error: "User not authenticated" };
   }
@@ -17,8 +16,6 @@ export async function getLoggedInUser() {
   await dbConnect();
 
   const user = await User.findOne({ clerkId });
-
-  console.log("user", user);
 
   if (!user) {
     return { success: false, error: "User not found" };
