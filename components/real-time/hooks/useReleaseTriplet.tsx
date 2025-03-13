@@ -88,8 +88,6 @@ export const useReleaseTriplet = () => {
 
     if (requestedByMe) return;
 
-    console.log("hasReleaseRequest", hasReleaseRequest, currentTriplet, user);
-
     return hasReleaseRequest;
   }, [currentTriplet, releaseRequests, user]);
 
