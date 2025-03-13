@@ -1,3 +1,4 @@
+import { checkIfTripletIsPending } from "@/lib/actions/triplet.actions";
 import { LiveObject } from "@liveblocks/client";
 import {
   useMutation,
@@ -20,7 +21,9 @@ const usePendingTriplets = () => {
   const lockedTripletsObject = useStorage((root) => root.lockedTriplets);
 
   const lockedTriplets = useMemo(() => {
-    return Object.values(lockedTripletsObject);
+    const toReturn = Object.values(lockedTripletsObject);
+    console.log("All locked triplets", toReturn);
+    return toReturn;
   }, [lockedTripletsObject]);
 
   const removeUserOtherLockedTriplets = useMutation(
@@ -237,6 +240,17 @@ const usePendingTriplets = () => {
   useEffect(() => {
     if (pendingTripletsCount === 0 && currentTriplet) {
       resetLockedTriplet(currentTriplet._id);
+    }
+
+    if (currentTriplet) {
+      checkIfTripletIsPending(currentTriplet._id).then(
+        (isTripletStatusPending) => {
+          if (!isTripletStatusPending) {
+            resetLockedTriplet(currentTriplet._id);
+            toast.error("Triplet is not pending anymore");
+          }
+        }
+      );
     }
   }, [pendingTripletsCount, currentTriplet]);
 
