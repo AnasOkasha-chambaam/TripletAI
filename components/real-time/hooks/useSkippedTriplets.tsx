@@ -26,8 +26,6 @@ const useSkippedTriplets = () => {
 
   const skipTriplet = useMutation(
     ({ storage, self }, tripletId: string) => {
-      console.log("triplet.id", tripletId);
-
       const {
         presence: { user },
       } = self;
