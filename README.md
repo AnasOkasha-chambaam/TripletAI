@@ -20,6 +20,8 @@ The purpose of TripletAI is to streamline the process of managing supervised lea
 - **Node.js 24.20.0** (LTS "Krypton") — pinned in [`.nvmrc`](.nvmrc). With [nvm](https://github.com/nvm-sh/nvm), run `nvm install && nvm use` in the project root to pick it up.
 - **pnpm 11.25.0** — pinned via the `packageManager` field in `package.json`. Any recent pnpm will download and switch to this exact version automatically, so no manual install step is needed.
 
+> **Note on deployment:** Vercel only supports pnpm 6–10 natively, and `lockfileVersion: 9.0` is ambiguous (pnpm 9, 10 and 11 all write it), so Vercel guesses an older pnpm. [`vercel.json`](vercel.json) therefore pins the install to pnpm 11.25.0 explicitly. For the same reason `package.json` deliberately has **no** `engines.pnpm` field — Vercel compares it against its own guessed version and hard-fails the build. Don't add it back.
+
 ### Installation
 
 1. Clone the repository:
