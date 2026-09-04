@@ -1,38 +1,24 @@
-import {
-  clerkClient,
-  clerkMiddleware,
-  createRouteMatcher,
-} from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+// Pages that require a Clerk session. Everything else is public at the edge.
+//
+// Per-user authorization (ALLOWED_EMAILS) deliberately does NOT live here any
+// more: it now runs in lib/auth/current-user.ts, in the Node runtime, where it
+// reads env at request time, already has the user's email without a Clerk API
+// round trip, and can also guard Server Actions and route handlers — none of
+// which middleware can reach.
+const isProtectedPage = createRouteMatcher(["/dashboard(.*)"]);
 
-const allowedEmails =
-  process.env.ALLOWED_EMAILS === "*"
-    ? "*"
-    : process.env.ALLOWED_EMAILS?.split(",") || [];
+// Clerk calls this itself; it authenticates via its own svix signature.
+const isPublicApi = createRouteMatcher(["/api/webhooks/(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  } else {
-    return NextResponse.next();
-  }
+  if (isPublicApi(req)) return;
 
-  const { userId } = await auth();
-
-  if (userId) {
-    const user = await (await clerkClient()).users.getUser(userId);
-
-    // console.log("user from middleware: ", user);
-
-    if (
-      allowedEmails !== "*" &&
-      !allowedEmails.includes(user.emailAddresses[0].emailAddress)
-    ) {
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
-    }
-  }
+  // Not adding /api/* here on purpose: auth.protect() returns notFound() (404)
+  // rather than 401 for non-page requests. Those routes guard themselves with
+  // requireApiUser() instead.
+  if (isProtectedPage(req)) await auth.protect();
 });
 
 export const config = {

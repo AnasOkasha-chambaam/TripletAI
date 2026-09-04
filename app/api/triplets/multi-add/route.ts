@@ -1,9 +1,13 @@
 import { addTriplet } from "@/lib/actions/triplet.actions";
+import { requireApiUser } from "@/lib/auth/current-user";
 import dbConnect from "@/lib/dbConnect";
 import { JSONify } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  const { response: unauthorized } = await requireApiUser();
+  if (unauthorized) return unauthorized;
+
   try {
     await dbConnect();
     const triplets: TTripletFields[] = await request.json();

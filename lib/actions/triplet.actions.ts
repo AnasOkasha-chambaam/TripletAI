@@ -4,8 +4,16 @@
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
 import { parse } from "csv-parse/sync";
+import { getCurrentAppUser } from "../auth/current-user";
 import { ObjectIdZodSchema } from "../schemas/helpers.zod";
 import { JSONify } from "../utils";
+
+// Server Actions POST to whatever URL the invoking page is on, so middleware
+// never sees them — every mutating action has to guard itself.
+async function assertAuthorized() {
+  const authed = await getCurrentAppUser();
+  return authed.ok ? null : ({ success: false, error: "Not authorized" } as const);
+}
 
 export async function getTripletById(tripletId: string) {
   await dbConnect();
@@ -24,6 +32,9 @@ export async function addTriplet(
     hardSetStatus?: TTriplet["status"];
   }
 ): Promise<TAddTripletState> {
+  const unauthorized = await assertAuthorized();
+  if (unauthorized) return unauthorized;
+
   await dbConnect();
 
   // console.log("adding triplet: ", { instruction, input, output });
@@ -47,6 +58,9 @@ export async function importTriplets(
   prevState: null | TImportTripletsState,
   formData: FormData
 ) {
+  const unauthorized = await assertAuthorized();
+  if (unauthorized) return unauthorized;
+
   await dbConnect();
 
   const file = formData.get("file") as File;
@@ -96,6 +110,9 @@ export async function updateTripletStatus(
 
   { tripletId, newStatus }: { tripletId: string; newStatus: string }
 ) {
+  const unauthorized = await assertAuthorized();
+  if (unauthorized) return unauthorized;
+
   await dbConnect();
 
   try {
@@ -128,6 +145,9 @@ export async function editTriplet(
     output,
   }: { tripletId: string; instruction: string; input: string; output: string }
 ) {
+  const unauthorized = await assertAuthorized();
+  if (unauthorized) return unauthorized;
+
   await dbConnect();
 
   try {

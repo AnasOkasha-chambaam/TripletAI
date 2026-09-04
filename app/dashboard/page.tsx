@@ -8,7 +8,7 @@ import RejectedTriplets from "@/components/RejectedTriplets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getInitialPresence } from "@/lib/actions/liveblocks.actions";
 import { getRoom } from "@/lib/actions/room.actions";
-import { getLoggedInUser } from "@/lib/actions/user.actions";
+import { getCurrentAppUser } from "@/lib/auth/current-user";
 import { CircleCheckIcon, CircleDotIcon, CircleXIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Room } from "./Room";
@@ -18,13 +18,17 @@ export default async function Dashboard({}: {
     roomId: string;
   }>;
 }) {
-  const initialPresence = await getInitialPresence();
+  // Guard first, and carry the reason so /unauthorized can explain itself.
+  const result = await getCurrentAppUser();
 
-  const { user } = await getLoggedInUser();
-
-  if (!user) {
-    return redirect("/unauthorized");
+  if (!result.ok) {
+    return redirect(`/unauthorized?reason=${result.reason}`);
   }
+
+  const { user } = result;
+
+  // Free: getCurrentAppUser() is cache()d, so this reuses the lookup above.
+  const initialPresence = await getInitialPresence();
 
   const room = await getRoom({
     roomId: "triplet-ai-room", // TODO: Use the dynamic room id here
