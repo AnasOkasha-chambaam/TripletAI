@@ -17,8 +17,8 @@ The purpose of TripletAI is to streamline the process of managing supervised lea
 
 ### Prerequisites
 
-- Node.js (>= 18.18)
-- npm or yarn or pnpm
+- **Node.js 24.20.0** (LTS "Krypton") — pinned in [`.nvmrc`](.nvmrc). With [nvm](https://github.com/nvm-sh/nvm), run `nvm install && nvm use` in the project root to pick it up.
+- **pnpm 11.25.0** — pinned via the `packageManager` field in `package.json`. Any recent pnpm will download and switch to this exact version automatically, so no manual install step is needed.
 
 ### Installation
 
@@ -32,10 +32,6 @@ The purpose of TripletAI is to streamline the process of managing supervised lea
 2. Install dependencies:
 
    ```sh
-   npm install
-   # or
-   yarn install
-   # or
    pnpm install
    ```
 
@@ -58,10 +54,6 @@ NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=YOUR_LIVEBLOCKS_PUBLIC_KEY
 4. Run the development server:
 
    ```sh
-   npm run dev
-   # or
-   yarn dev
-   # or
    pnpm dev
    ```
 
