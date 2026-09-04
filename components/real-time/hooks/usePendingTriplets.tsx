@@ -22,7 +22,7 @@ const usePendingTriplets = () => {
 
   const lockedTriplets = useMemo(() => {
     const toReturn = Object.values(lockedTripletsObject);
-    console.log("All locked triplets", toReturn);
+
     return toReturn;
   }, [lockedTripletsObject]);
 
@@ -42,7 +42,7 @@ const usePendingTriplets = () => {
         }
       });
     },
-    []
+    [],
   );
 
   const lockedTripletsByOthers = useMemo(() => {
@@ -52,7 +52,7 @@ const usePendingTriplets = () => {
     return lockedTriplets.filter(
       (lt) =>
         lt.lockedBy.id !== currentUser.id &&
-        connectedUsersIds.some((cui) => cui[1] === lt.lockedBy.id)
+        connectedUsersIds.some((cui) => cui[1] === lt.lockedBy.id),
     );
   }, [lockedTriplets, currentUser, connectedUsersIds]);
 
@@ -65,7 +65,7 @@ const usePendingTriplets = () => {
       return;
     }
     return lockedTriplets.find(
-      (triplet) => triplet.lockedBy.id === currentUser.id
+      (triplet) => triplet.lockedBy.id === currentUser.id,
     )?.["triplet"];
   }, [lockedTriplets, currentUser]);
 
@@ -73,7 +73,7 @@ const usePendingTriplets = () => {
     (
       { storage, self, others },
       triplet: TTriplet,
-      pendingTripletsCount: number
+      pendingTripletsCount: number,
     ) => {
       const {
         presence: { user },
@@ -101,7 +101,7 @@ const usePendingTriplets = () => {
       }
 
       const isTripletOwnerOnline = others.some(
-        (other) => other.presence.user?.id === tripletOwnerId
+        (other) => other.presence.user?.id === tripletOwnerId,
       );
 
       if (isTripletLocked && isTripletOwnerOnline) {
@@ -114,21 +114,21 @@ const usePendingTriplets = () => {
         new LiveObject({
           triplet,
           lockedBy: user,
-        })
+        }),
       );
 
       toast.success("Triplet locked successfully", {
         description: `Total pending triplets: ${pendingTripletsCount}`,
       });
     },
-    []
+    [],
   );
 
   const unlockTriplet = useMutation(
     (
       { storage, self },
       tripletId: string,
-      appliedAction: "accept" | "reject" | "edit" | "skip"
+      appliedAction: "accept" | "reject" | "edit" | "skip",
     ) => {
       const {
         presence: { user },
@@ -188,7 +188,7 @@ const usePendingTriplets = () => {
         });
         removeUserOtherLockedTriplets(
           tripletId,
-          hasReleaseRequest.get("requestedBy").id
+          hasReleaseRequest.get("requestedBy").id,
         );
 
         return;
@@ -220,7 +220,7 @@ const usePendingTriplets = () => {
 
       storage.get("lockedTriplets").delete(tripletId);
     },
-    []
+    [],
   );
 
   const forceUnlockTriplet = useMutation(({ storage }, tripletId: string) => {
@@ -249,7 +249,7 @@ const usePendingTriplets = () => {
             resetLockedTriplet(currentTriplet._id);
             toast.error("Triplet is not pending anymore");
           }
-        }
+        },
       );
     }
   }, [pendingTripletsCount, currentTriplet]);
