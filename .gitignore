@@ -39,6 +39,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare
+/.open-next/
+/.wrangler/
+# Not covered by the .env* rule above — it needs its own line.
+.dev.vars
+.dev.vars.*
+# ~500KB of generated workerd types, pinned to one workerd build. Regenerate
+# with `pnpm cf-typegen` rather than committing it.
+cloudflare-env.d.ts
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

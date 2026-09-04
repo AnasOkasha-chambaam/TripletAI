@@ -1,5 +1,5 @@
 import { getCurrentAppUser } from "@/lib/auth/current-user";
-import { liveblocks } from "@/lib/liveblocks";
+import { getLiveblocks } from "@/lib/liveblocks";
 
 // No request body is read on purpose: with identifyUser (ID tokens) the room
 // permissions come from the room's own defaultAccesses / usersAccesses, not
@@ -18,7 +18,7 @@ export async function POST() {
 
   const { user } = result;
 
-  const { status, body } = await liveblocks.identifyUser(
+  const { status, body } = await getLiveblocks().identifyUser(
     {
       userId: user.id,
       groupIds: [],

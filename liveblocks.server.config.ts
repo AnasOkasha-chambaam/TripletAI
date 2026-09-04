@@ -1,6 +1,6 @@
 import { createClient, LiveObject } from "@liveblocks/client";
 import WebSocket from "ws";
-import { liveblocks } from "./lib/liveblocks";
+import { getLiveblocks } from "./lib/liveblocks";
 
 // 1. Creating a node client
 
@@ -9,7 +9,7 @@ export const serverClient = createClient({
   // 3. Authenticating inside the client
   authEndpoint: async (room) => {
     if (!room) return;
-    const session = liveblocks.prepareSession(
+    const session = getLiveblocks().prepareSession(
       // 4. Using a specific userId for all server changes
       "_SERVICE_ACCOUNT",
       {

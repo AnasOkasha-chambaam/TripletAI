@@ -3,7 +3,7 @@
 import { RoomAccesses } from "@liveblocks/node";
 import { revalidatePath } from "next/cache";
 import { nanoid } from "nanoid";
-import { liveblocks } from "../liveblocks";
+import { getLiveblocks } from "../liveblocks";
 import { JSONify } from "../utils";
 
 const TRIPLET_AI_ROOM_TITLE = "Triplet AI Room";
@@ -32,7 +32,7 @@ async function createRoom({
     [userId]: ["room:write"],
   };
 
-  return await liveblocks.createRoom(roomId, {
+  return await getLiveblocks().createRoom(roomId, {
     defaultAccesses: ["room:write"],
     metadata: {
       creatorId: userId,
@@ -71,7 +71,7 @@ export const createTripletAIRoom = async ({ userId }: { userId: string }) => {
 };
 
 /**
- * Get-or-create. liveblocks.getRoom() THROWS a 404 for a missing room rather
+ * Get-or-create. getRoom() THROWS a 404 for a missing room rather
  * than returning null, so a fresh Liveblocks project used to 500 the dashboard.
  */
 export const getRoom = async ({
@@ -82,7 +82,7 @@ export const getRoom = async ({
   userId: string;
 }) => {
   try {
-    const room = await liveblocks.getRoom(roomId);
+    const room = await getLiveblocks().getRoom(roomId);
     return JSONify<typeof room>(room);
   } catch (err) {
     if (statusOf(err) !== 404) throw err;
@@ -98,7 +98,7 @@ export const getRoom = async ({
       // 409: a concurrent request created it between our get and our create.
       if (statusOf(createErr) !== 409) throw createErr;
 
-      const room = await liveblocks.getRoom(roomId);
+      const room = await getLiveblocks().getRoom(roomId);
       return JSONify<typeof room>(room);
     }
   }
