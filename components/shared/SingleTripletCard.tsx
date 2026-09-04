@@ -72,7 +72,12 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     currentUserHasAReleaseRequest ||
     currentTripletIsSkippedByCurrentUser;
 
-  const JSONResponse = JSON.parse(triplet?.output?.trim() || "0");
+  let JSONResponse = triplet?.output?.trim();
+  try {
+    if (JSONResponse) {
+      JSONResponse = JSON.parse(JSONResponse);
+    }
+  } catch (error) {}
 
   return (
     <Card
@@ -97,8 +102,8 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
                 {statusToApply === "accepted"
                   ? "Accepting Triplet"
                   : statusToApply === "rejected"
-                  ? "Rejecting Triplet"
-                  : "Loading"}
+                    ? "Rejecting Triplet"
+                    : "Loading"}
               </>
             ) : triplet === null ? (
               <>
@@ -120,14 +125,14 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
             {isLoading || isActionPending
               ? "Wait a second"
               : triplet === null
-              ? "There are no triplets to display at the moment."
-              : !!lockedBy
-              ? `By: ${lockedBy.username}`
-              : triplet?.status === "accepted"
-              ? "Select to export"
-              : triplet?.status === "rejected"
-              ? "Edit and accept"
-              : "Swipe to take an action"}
+                ? "There are no triplets to display at the moment."
+                : !!lockedBy
+                  ? `By: ${lockedBy.username}`
+                  : triplet?.status === "accepted"
+                    ? "Select to export"
+                    : triplet?.status === "rejected"
+                      ? "Edit and accept"
+                      : "Swipe to take an action"}
           </CardDescription>
         </CardHeader>
         {(onSelect || onEdit || lockedBy) && (
@@ -153,7 +158,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
               if (!triplet) return;
               requestRelease(
                 triplet?._id,
-                "Please, pass this triplet for me to view it."
+                "Please, pass this triplet for me to view it.",
               );
             }}
             className="mx-4"
@@ -207,7 +212,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
             > */}
             {typeof JSONResponse === "string" ? (
               <p>{JSONResponse}</p>
-            ) : typeof Array.isArray(JSONResponse) ? (
+            ) : Array.isArray(JSONResponse) ? (
               <ResponseRenderer response={JSONResponse} />
             ) : (
               <p
