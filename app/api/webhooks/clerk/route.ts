@@ -1,107 +1,110 @@
 // /app/api/webhooks/clerk/route.ts
+//
+// An optimization, not the source of truth. Users are also provisioned
+// just-in-time by lib/auth/current-user.ts, so a missed or failed delivery no
+// longer locks anyone out. This handler keeps Mongo in step with renames,
+// avatar changes and deletions.
 
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import type { WebhookEvent } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/lib/models/User";
+import {
+  displayNameOf,
+  primaryEmailOfJSON,
+  syncUserRow,
+} from "@/lib/auth/user-sync";
 
 export async function POST(req: Request) {
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const secret =
+    process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? process.env.WEBHOOK_SECRET;
 
-  if (!WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
+  // Never throw at the top of a handler — that surfaces to Svix as an opaque 500.
+  if (!secret) {
+    console.error(
+      "[clerk-webhook] no signing secret configured (set CLERK_WEBHOOK_SIGNING_SECRET)"
     );
+    return NextResponse.json({ error: "Not configured" }, { status: 500 });
   }
 
-  // Get the headers
-  const headerPayload = req.headers;
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  const svixId = req.headers.get("svix-id");
+  const svixTimestamp = req.headers.get("svix-timestamp");
+  const svixSignature = req.headers.get("svix-signature");
 
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return NextResponse.json(
-      { error: "Error occurred -- no svix headers" },
-      { status: 400 }
-    );
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    return NextResponse.json({ error: "Missing svix headers" }, { status: 400 });
   }
 
-  // Get the body
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
-
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET);
+  // Svix signs the RAW bytes. Round-tripping through req.json() can change
+  // them (key order, unicode escapes, number formatting) and break the signature.
+  const body = await req.text();
 
   let evt: WebhookEvent;
-
-  // Verify the payload with the headers
   try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
+    evt = new Webhook(secret).verify(body, {
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return NextResponse.json({ error: "Error occurred" }, { status: 400 });
+    console.error("[clerk-webhook] signature verification failed", err);
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  // Handle the webhook
-  const eventType = evt.type;
-
-  if (eventType === "user.created") {
-    const { id, email_addresses, username, image_url } = evt.data;
-
+  try {
     await dbConnect();
 
-    try {
-      const existingUser = await User.findOne({
-        email: email_addresses[0].email_address,
-      });
+    switch (evt.type) {
+      case "user.created":
+      case "user.updated": {
+        const data = evt.data;
+        const primary = primaryEmailOfJSON(data);
 
-      if (existingUser) {
-        existingUser.clerkId = id;
-        existingUser.username = username;
-        existingUser.picture = image_url;
-        await existingUser.save();
-        return NextResponse.json(
-          { message: "User updated successfully" },
-          { status: 200 }
+        // 200 on purpose: with no email we can never store this user, so a
+        // retry could never succeed.
+        if (!primary) {
+          return NextResponse.json({ skipped: "no-email" }, { status: 200 });
+        }
+
+        const result = await syncUserRow(
+          {
+            clerkId: data.id,
+            email: primary.email,
+            username: displayNameOf(
+              {
+                username: data.username,
+                firstName: data.first_name,
+                lastName: data.last_name,
+              },
+              primary.email
+            ),
+            picture: data.image_url,
+          },
+          { allowRelink: primary.verified }
         );
+
+        if (!result.ok) {
+          return NextResponse.json({ skipped: result.reason }, { status: 200 });
+        }
+        break;
       }
 
-      const newUser = new User({
-        clerkId: id,
-        email: email_addresses[0].email_address,
-        username: username,
-        picture: image_url,
-      });
+      case "user.deleted": {
+        // DeletedObjectJSON.id is optional in Clerk's types.
+        if (evt.data.id) await User.deleteOne({ clerkId: evt.data.id });
+        break;
+      }
 
-      await newUser.save();
-      console.log("User added to database:", newUser);
-
-      return NextResponse.json(
-        { message: "User added successfully" },
-        { status: 200 }
-      );
-    } catch (error) {
-      console.error("Error adding user to database:", error);
-      return NextResponse.json(
-        { error: "Error adding user to database" },
-        { status: 500 }
-      );
+      default:
+        // Unhandled event types must still 200, or Svix retries forever.
+        break;
     }
+
+    return NextResponse.json({ received: true }, { status: 200 });
+  } catch (err) {
+    // 5xx so Svix DOES retry a transient database failure.
+    console.error("[clerk-webhook] handler failed", evt.type, err);
+    return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "Webhook received" }, { status: 200 });
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

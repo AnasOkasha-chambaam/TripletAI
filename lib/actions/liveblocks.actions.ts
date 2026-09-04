@@ -1,11 +1,11 @@
 "use server";
-import { getLoggedInUser } from "./user.actions";
+import { getCurrentAppUser } from "@/lib/auth/current-user";
 
 // get initial presence
 export async function getInitialPresence(): Promise<TLiveblocks["Presence"]> {
-  const { user: loggedInUser } = await getLoggedInUser();
+  const result = await getCurrentAppUser();
 
-  if (!loggedInUser) {
+  if (!result.ok) {
     return {
       user: null,
       skippedTripletIds: [],
@@ -14,9 +14,9 @@ export async function getInitialPresence(): Promise<TLiveblocks["Presence"]> {
 
   return {
     user: {
-      id: loggedInUser.id,
-      username: loggedInUser.username,
-      picture: loggedInUser.picture,
+      id: result.user.id,
+      username: result.user.username,
+      picture: result.user.picture,
     },
     skippedTripletIds: [],
   };

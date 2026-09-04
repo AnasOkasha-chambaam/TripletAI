@@ -1,25 +1,24 @@
 "use server";
-// /actions/triplet.actions.ts
+// /actions/user.actions.ts
 
-import dbConnect from "@/lib/dbConnect";
-import User from "../models/User";
-import { JSONify } from "../utils";
-import { auth } from "@clerk/nextjs/server";
+import {
+  getCurrentAppUser,
+  type TAppUserFailure,
+} from "@/lib/auth/current-user";
 
-export async function getLoggedInUser() {
-  const { userId: clerkId } = await auth();
+/**
+ * Kept for backward compatibility with existing call sites.
+ * Prefer getCurrentAppUser() directly — it distinguishes failure reasons
+ * (e.g. "the database is unreachable" vs. "you are not allowed in").
+ */
+export async function getLoggedInUser(): Promise<{
+  success: boolean;
+  user?: TUser;
+  error?: TAppUserFailure;
+}> {
+  const result = await getCurrentAppUser();
 
-  if (!clerkId) {
-    return { success: false, error: "User not authenticated" };
-  }
+  if (!result.ok) return { success: false, error: result.reason };
 
-  await dbConnect();
-
-  const user = await User.findOne({ clerkId });
-
-  if (!user) {
-    return { success: false, error: "User not found" };
-  }
-
-  return { success: true, user: JSONify<TUser>(user) };
+  return { success: true, user: result.user };
 }

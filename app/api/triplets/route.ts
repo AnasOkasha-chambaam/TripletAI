@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Triplet from "@/lib/models/Triplet";
 import { addTriplet } from "@/lib/actions/triplet.actions";
+import { requireApiUser } from "@/lib/auth/current-user";
 
 type TQuery = {
   status?: string;
@@ -17,6 +18,9 @@ type TSort = {
 };
 
 export async function GET(request: NextRequest) {
+  const { response: unauthorized } = await requireApiUser();
+  if (unauthorized) return unauthorized;
+
   const { searchParams } = request.nextUrl;
   const status = searchParams.get("status");
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -64,6 +68,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: Request) {
+  const { response: unauthorized } = await requireApiUser();
+  if (unauthorized) return unauthorized;
+
   try {
     const { instruction, input, output } = await request.json();
 
