@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // MUST match the Worker that already exists in the Cloudflare dashboard.
+  // A different name here does not rename that Worker — it silently creates a
+  // second, unrelated one and deploys there instead.
+  "name": "triplet-ai",
+
+  "main": ".open-next/worker.js",
+
+  // Floors this date has to clear:
+  //   >= 2024-09-23  nodejs_compat v2 (required by @opennextjs/cloudflare)
+  //   >= 2025-05-05  avoids the OpenNext FinalizationRegistry error
+  //   recent enough  for the node:net / node:tls work that lets the MongoDB
+  //                  driver open a TLS socket at all — without it Mongoose
+  //                  cannot connect from a Worker.
+  // Capped here rather than set to "today": wrangler 4.128.0 bundles
+  // workerd@1.20260831.1, and a date newer than the local workerd build makes
+  // `wrangler dev` warn.
+  "compatibility_date": "2026-08-25",
+
+  // global_fetch_strictly_public makes fetch() to your own domain go out to the
+  // public internet instead of looping back inside the Worker, which is what
+  // Next.js expects.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // sharp does not run on Workers, so Next's default image optimizer is
+  // unavailable. This binding gives OpenNext a Next-compatible optimizer.
+  // Requires Cloudflare Images to be enabled on the account (billed).
+  "images": {
+    "binding": "IMAGES"
+  },
+
+  // The dashboard currently has this off; enabling it here turns on Workers
+  // Logs at deploy so the first production request is debuggable.
+  "observability": {
+    "enabled": true
+  }
+}

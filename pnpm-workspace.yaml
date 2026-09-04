@@ -1,3 +1,18 @@
+# pnpm 11 blocks dependency lifecycle scripts unless they are ruled on here.
+# strictDepBuilds defaults to true, so an unruled build script is a HARD
+# ERR_PNPM_IGNORED_BUILDS, not a warning — and verifyDepsBeforeRun re-checks
+# before every script, so it would block lint, typecheck, build and dev alike.
+#
+# This is the pnpm 11 `allowBuilds` MAP. Do not convert it to the pnpm 10
+# `onlyBuiltDependencies` list: pnpm 11 removed that setting outright.
+# Conversely, if a CI runner ever falls back to pnpm 10, this map is silently
+# ignored — which is exactly why both vercel.json and the Cloudflare build
+# command pin pnpm explicitly rather than trusting the runner's default.
 allowBuilds:
   '@clerk/shared': true
   sharp: true
+  # Pulled in by wrangler; both declare `postinstall: node install.js` and
+  # fetch/link their platform binary. workerd is the Workers runtime itself, so
+  # without this the local `wrangler dev` and the worker build cannot run.
+  workerd: true
+  esbuild: true
