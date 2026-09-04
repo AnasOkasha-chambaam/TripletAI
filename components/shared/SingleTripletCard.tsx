@@ -77,6 +77,7 @@ const SingleTripletCard: React.FC<TripletCardProps> = ({
     if (JSONResponse) {
       JSONResponse = JSON.parse(JSONResponse);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {}
 
   return (
